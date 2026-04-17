@@ -1,0 +1,21 @@
+name = "grafana-network-analytics"
+account_id = "7a0c39354edd897a1a98f6c7e50c6873"
+main = "src/index.ts"
+compatibility_date = "2026-04-17"
+routes = [{ pattern = "grafana.cfdemo.me", zone_name = "cfdemo.me" }]
+
+[[containers]]
+max_instances = 1
+class_name = "GrafanaContainer"
+image = "./container/Dockerfile"
+
+[[durable_objects.bindings]]
+name = "GRAFANA"
+class_name = "GrafanaContainer"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["GrafanaContainer"]
+
+[secrets]
+required = ["CF_API_TOKEN", "GF_SECURITY_ADMIN_PASSWORD"]

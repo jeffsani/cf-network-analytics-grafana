@@ -1,4 +1,5 @@
 import { Container, getContainer } from "@cloudflare/containers";
+import { env } from "cloudflare:workers";
 
 interface Env {
   GRAFANA: DurableObjectNamespace;
@@ -9,23 +10,20 @@ interface Env {
 export class GrafanaContainer extends Container {
   defaultPort = 3000;
   sleepAfter = "30m";
+  envVars = {
+    CF_API_TOKEN: env.CF_API_TOKEN,
+    GF_SECURITY_ADMIN_PASSWORD: env.GF_SECURITY_ADMIN_PASSWORD,
+  };
 
-  override get envVars(): Record<string, string> {
-    return {
-      CF_API_TOKEN: (this.env as Env).CF_API_TOKEN,
-      GF_SECURITY_ADMIN_PASSWORD: (this.env as Env).GF_SECURITY_ADMIN_PASSWORD,
-    };
-  }
-
-  override onStart(): void {
+  override onStart() {
     console.log("Grafana container started");
   }
 
-  override onStop(): void {
+  override onStop() {
     console.log("Grafana container stopped");
   }
 
-  override onError(error: unknown): void {
+  override onError(error: unknown) {
     console.error("Grafana container error:", error);
   }
 }

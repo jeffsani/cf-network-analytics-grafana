@@ -16,6 +16,3 @@ class_name = "GrafanaContainer"
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["GrafanaContainer"]
-
-[secrets]
-required = ["CF_API_TOKEN", "GF_SECURITY_ADMIN_PASSWORD"]

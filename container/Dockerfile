@@ -1,12 +1,29 @@
-FROM grafana/grafana-oss:latest
+FROM grafana/grafana-oss:11.6.0
 
 ENV GF_INSTALL_PLUGINS=yesoreyeram-infinity-datasource
+# Auth: Cloudflare Access handles authentication externally
 ENV GF_AUTH_ANONYMOUS_ENABLED=true
 ENV GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
-ENV GF_AUTH_BASIC_ENABLED=true
+ENV GF_AUTH_BASIC_ENABLED=false
+ENV GF_AUTH_DISABLE_LOGIN_FORM=true
+ENV GF_AUTH_DISABLE_SIGNOUT_MENU=true
 ENV GF_SECURITY_ALLOW_EMBEDDING=true
 ENV GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s/
 ENV GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/etc/grafana/provisioning/dashboards/cloudflare-network-analytics.json
+ENV GF_ANALYTICS_REPORTING_ENABLED=false
+ENV GF_ANALYTICS_CHECK_FOR_UPDATES=false
+ENV GF_ANALYTICS_CHECK_FOR_PLUGIN_UPDATES=false
+ENV GF_USERS_DEFAULT_THEME=dark
+ENV GF_EXPLORE_ENABLED=false
+ENV GF_ALERTING_ENABLED=false
+ENV GF_UNIFIED_ALERTING_ENABLED=false
+ENV GF_SERVER_SERVE_FROM_SUB_PATH=false
+ENV GF_USERS_VIEWERS_CAN_EDIT=false
+ENV GF_AUTH_ANONYMOUS_HIDE_VERSION=true
+ENV GF_NEWS_NEWS_FEED_ENABLED=false
+ENV GF_HELP_ENABLED=false
+ENV GF_PROFILE_ENABLED=false
+ENV GF_DASHBOARDS_MIN_REFRESH_INTERVAL=30s
 
 COPY provisioning/datasources/ /etc/grafana/provisioning/datasources/
 COPY provisioning/dashboards/ /etc/grafana/provisioning/dashboards/

@@ -75,7 +75,8 @@
             }
           },
           "min": 0,
-          "unit": "pps"
+          "unit": "short",
+          "displayName": "${__series.name}"
         },
         "overrides": []
       },
@@ -83,7 +84,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 1
+        "y": 19
       },
       "id": 1,
       "options": {
@@ -100,7 +101,7 @@
           "sort": "desc"
         }
       },
-      "title": "Traffic by Destination Subnet (Packets)",
+      "title": "Traffic by Destination Subnet (Packets/s)",
       "type": "timeseries",
       "targets": [
         {
@@ -127,7 +128,7 @@
             },
             {
               "selector": "avg.packetRate",
-              "text": "Packets/s",
+              "text": "Rate",
               "type": "number"
             }
           ],
@@ -138,7 +139,7 @@
             "body_type": "graphql",
             "body_content_type": "application/json",
             "body_form": [],
-            "body_graphql_query": "query {\n  viewer {\n    accounts(filter: {accountTag: \"${accountTag}\"}) {\n      magicTransitNetworkAnalyticsAdaptiveGroups(\n        limit: 10000\n        filter: {\n          datetime_geq: \"${__from:date:iso}\"\n          datetime_lt: \"${__to:date:iso}\"\n          outcome: \"pass\"\n        }\n        orderBy: [datetime${timeBucket}_ASC, avg_bitRate${timeBucket}_DESC]\n      ) {\n        dimensions {\n          datetimeFiveMinutes: datetime${timeBucket}\n          ipDestinationSubnet\n        }\n        avg {\n          packetRate: packetRate${timeBucket}\n        }\n      }\n    }\n  }\n}",
+            "body_graphql_query": "query {\n  viewer {\n    accounts(filter: {accountTag: \"${accountTag}\"}) {\n      magicTransitNetworkAnalyticsAdaptiveGroups(\n        limit: 10000\n        filter: {\n          datetime_geq: \"${__from:date:iso}\"\n          datetime_lt: \"${__to:date:iso}\"\n          outcome: \"pass\"\n        }\n        orderBy: [datetimeFiveMinutes_ASC, avg_packetRateFiveMinutes_DESC]\n      ) {\n        dimensions {\n          datetimeFiveMinutes\n          ipDestinationSubnet\n        }\n        avg {\n          packetRate: packetRateFiveMinutes\n        }\n      }\n    }\n  }\n}",
             "data": ""
           }
         }
@@ -194,7 +195,8 @@
             }
           },
           "min": 0,
-          "unit": "bps"
+          "unit": "short",
+          "displayName": "${__series.name}"
         },
         "overrides": []
       },
@@ -202,7 +204,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 1
+        "y": 19
       },
       "id": 2,
       "options": {
@@ -219,7 +221,7 @@
           "sort": "desc"
         }
       },
-      "title": "Traffic by Destination Subnet (Bits)",
+      "title": "Traffic by Destination Subnet (Bits/s)",
       "type": "timeseries",
       "targets": [
         {
@@ -246,7 +248,7 @@
             },
             {
               "selector": "avg.bitRate",
-              "text": "Bits/s",
+              "text": "Rate",
               "type": "number"
             }
           ],
@@ -284,46 +286,36 @@
           "color": {
             "mode": "palette-classic"
           },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            }
-          },
           "mappings": [],
-          "unit": "pps"
+          "unit": "short"
         },
         "overrides": []
       },
       "gridPos": {
         "h": 9,
-        "w": 6,
+        "w": 12,
         "x": 0,
-        "y": 9
+        "y": 10
       },
       "id": 3,
       "options": {
-        "displayLabels": [
-          "name"
-        ],
+        "displayLabels": [],
         "legend": {
-          "displayMode": "hidden",
-          "placement": "right"
+          "displayMode": "table",
+          "placement": "right",
+          "values": ["value"]
         },
         "pieType": "pie",
         "reduceOptions": {
-          "calcs": [
-            "sum"
-          ],
-          "fields": "/Packets/",
-          "values": false
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
         },
         "tooltip": {
-          "mode": "multi"
+          "mode": "single"
         }
       },
-      "title": "Top Source ASNs",
+      "title": "Top Source ASNs (Packets/s)",
       "type": "piechart",
       "targets": [
         {
@@ -334,18 +326,18 @@
           },
           "type": "graphql",
           "source": "url",
-          "format": "dataframe",
+          "format": "table",
           "url": "https://api.cloudflare.com/client/v4/graphql",
           "root_selector": "data.viewer.accounts.0.magicTransitNetworkAnalyticsAdaptiveGroups",
           "columns": [
             {
-              "selector": "dimensions.sourceAsn",
+              "selector": "dimensions.sourceAsnName",
               "text": "ASN",
               "type": "string"
             },
             {
-              "selector": "avg.packetRate",
-              "text": "Packets/s",
+              "selector": "sum.packets",
+              "text": "Packets",
               "type": "number"
             }
           ],
@@ -356,8 +348,31 @@
             "body_type": "graphql",
             "body_content_type": "application/json",
             "body_form": [],
-            "body_graphql_query": "query {\n  viewer {\n    accounts(filter: {accountTag: \"${accountTag}\"}) {\n      magicTransitNetworkAnalyticsAdaptiveGroups(\n        limit: ${topN}\n        filter: {\n          datetime_geq: \"${__from:date:iso}\"\n          datetime_lt: \"${__to:date:iso}\"\n        }\n        orderBy: [avg_packetRate${timeBucket}_DESC]\n      ) {\n        dimensions {\n          sourceAsn\n        }\n        avg {\n          packetRate: packetRate${timeBucket}\n        }\n      }\n    }\n  }\n}",
+            "body_graphql_query": "query {\n  viewer {\n    accounts(filter: {accountTag: \"${accountTag}\"}) {\n      magicTransitNetworkAnalyticsAdaptiveGroups(\n        limit: 10000\n        filter: {\n          datetime_geq: \"${__from:date:iso}\"\n          datetime_lt: \"${__to:date:iso}\"\n          outcome: \"pass\"\n        }\n      ) {\n        dimensions {\n          sourceAsnName\n        }\n        sum {\n          packets\n        }\n      }\n    }\n  }\n}",
             "data": ""
+          },
+          "parser": "backend"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [{ "field": "Packets", "desc": true }]
+          }
+        },
+        {
+          "id": "limit",
+          "options": { "maxRows": 15 }
+        },
+        {
+          "id": "rowsToFields",
+          "options": {
+            "mappings": [
+              { "fieldName": "ASN", "handlerKey": "field.name" },
+              { "fieldName": "Packets", "handlerKey": "field.value" }
+            ]
           }
         }
       ]
@@ -372,46 +387,36 @@
           "color": {
             "mode": "palette-classic"
           },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            }
-          },
           "mappings": [],
-          "unit": "pps"
+          "unit": "short"
         },
         "overrides": []
       },
       "gridPos": {
         "h": 9,
-        "w": 6,
-        "x": 6,
-        "y": 9
+        "w": 12,
+        "x": 12,
+        "y": 10
       },
       "id": 4,
       "options": {
-        "displayLabels": [
-          "name"
-        ],
+        "displayLabels": [],
         "legend": {
-          "displayMode": "hidden",
-          "placement": "bottom"
+          "displayMode": "table",
+          "placement": "right",
+          "values": ["value"]
         },
         "pieType": "pie",
         "reduceOptions": {
-          "calcs": [
-            "sum"
-          ],
-          "fields": "/Packets/",
-          "values": false
+          "values": false,
+          "calcs": ["lastNotNull"],
+          "fields": ""
         },
         "tooltip": {
-          "mode": "multi"
+          "mode": "single"
         }
       },
-      "title": "Top Source Countries",
+      "title": "Top Source Countries (Packets/s)",
       "type": "piechart",
       "targets": [
         {
@@ -422,7 +427,7 @@
           },
           "type": "graphql",
           "source": "url",
-          "format": "dataframe",
+          "format": "table",
           "url": "https://api.cloudflare.com/client/v4/graphql",
           "root_selector": "data.viewer.accounts.0.magicTransitNetworkAnalyticsAdaptiveGroups",
           "columns": [
@@ -432,8 +437,8 @@
               "type": "string"
             },
             {
-              "selector": "avg.packetRate",
-              "text": "Packets/s",
+              "selector": "sum.packets",
+              "text": "Packets",
               "type": "number"
             }
           ],
@@ -444,8 +449,55 @@
             "body_type": "graphql",
             "body_content_type": "application/json",
             "body_form": [],
-            "body_graphql_query": "query {\n  viewer {\n    accounts(filter: {accountTag: \"${accountTag}\"}) {\n      magicTransitNetworkAnalyticsAdaptiveGroups(\n        limit: ${topN}\n        filter: {\n          datetime_geq: \"${__from:date:iso}\"\n          datetime_lt: \"${__to:date:iso}\"\n        }\n        orderBy: [avg_packetRate${timeBucket}_DESC]\n      ) {\n        dimensions {\n          sourceCountry\n        }\n        avg {\n          packetRate: packetRate${timeBucket}\n        }\n      }\n    }\n  }\n}",
+            "body_graphql_query": "query {\n  viewer {\n    accounts(filter: {accountTag: \"${accountTag}\"}) {\n      magicTransitNetworkAnalyticsAdaptiveGroups(\n        limit: 10000\n        filter: {\n          datetime_geq: \"${__from:date:iso}\"\n          datetime_lt: \"${__to:date:iso}\"\n          outcome: \"pass\"\n        }\n      ) {\n        dimensions {\n          sourceCountry\n        }\n        sum {\n          packets\n        }\n      }\n    }\n  }\n}",
             "data": ""
+          },
+          "parser": "backend"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "filterByValue",
+          "options": {
+            "filters": [
+              {
+                "fieldName": "Country",
+                "config": {
+                  "id": "isNotNull"
+                }
+              },
+              {
+                "fieldName": "Country",
+                "config": {
+                  "id": "regex",
+                  "options": {
+                    "value": ".+"
+                  }
+                }
+              }
+            ],
+            "match": "all",
+            "type": "include"
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [{ "field": "Packets", "desc": true }]
+          }
+        },
+        {
+          "id": "limit",
+          "options": { "maxRows": 15 }
+        },
+        {
+          "id": "rowsToFields",
+          "options": {
+            "mappings": [
+              { "fieldName": "Country", "handlerKey": "field.name" },
+              { "fieldName": "Packets", "handlerKey": "field.value" }
+            ]
           }
         }
       ]
@@ -470,15 +522,15 @@
               }
             ]
           },
-          "unit": "bps"
+          "unit": "short"
         },
         "overrides": []
       },
       "gridPos": {
         "h": 9,
         "w": 12,
-        "x": 12,
-        "y": 9
+        "x": 0,
+        "y": 1
       },
       "id": 5,
       "options": {
@@ -488,6 +540,9 @@
             "theme": "auto"
           },
           "type": "carto"
+        },
+        "tooltip": {
+          "mode": "details"
         },
         "controls": {
           "mouseWheelZoom": true,
@@ -512,7 +567,9 @@
               "geohash": "Geohash",
               "mode": "geohash"
             },
-            "type": "heatmap"
+            "type": "heatmap",
+            "name": "Colo Details",
+            "tooltip": true
           }
         ],
         "view": {
@@ -533,7 +590,7 @@
           },
           "type": "graphql",
           "source": "url",
-          "format": "dataframe",
+          "format": "table",
           "url": "https://api.cloudflare.com/client/v4/graphql",
           "root_selector": "data.viewer.accounts.0.magicTransitNetworkAnalyticsAdaptiveGroups",
           "columns": [
@@ -543,7 +600,7 @@
               "type": "string"
             },
             {
-              "selector": "dimensions.coloCode",
+              "selector": "dimensions.coloName",
               "text": "Colo",
               "type": "string"
             },
@@ -560,24 +617,42 @@
             "body_type": "graphql",
             "body_content_type": "application/json",
             "body_form": [],
-            "body_graphql_query": "query {\n  viewer {\n    accounts(filter: {accountTag: \"${accountTag}\"}) {\n      magicTransitNetworkAnalyticsAdaptiveGroups(\n        limit: 10000\n        filter: {\n          datetime_geq: \"${__from:date:iso}\"\n          datetime_lt: \"${__to:date:iso}\"\n          outcome: \"pass\"\n        }\n      ) {\n        dimensions {\n          coloGeohash\n          coloCode\n        }\n        avg {\n          bitRate: bitRate${timeBucket}\n        }\n      }\n    }\n  }\n}",
+            "body_graphql_query": "query {\n  viewer {\n    accounts(filter: {accountTag: \"${accountTag}\"}) {\n      magicTransitNetworkAnalyticsAdaptiveGroups(\n        limit: 10000\n        filter: {\n          datetime_geq: \"${__from:date:iso}\"\n          datetime_lt: \"${__to:date:iso}\"\n          outcome: \"pass\"\n        }\n      ) {\n        dimensions {\n          coloGeohash\n          coloName\n        }\n        avg {\n          bitRate: bitRate${timeBucket}\n        }\n      }\n    }\n  }\n}",
             "data": ""
           }
         }
+      ],
+      "transformations": [
+        {
+          "id": "groupBy",
+          "options": {
+            "fields": {
+              "Colo": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "Geohash": {
+                "aggregations": ["first"],
+                "operation": "aggregate"
+              },
+              "Bits/s": {
+                "aggregations": ["sum"],
+                "operation": "aggregate"
+              }
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "renameByName": {
+              "Geohash (first)": "Geohash",
+              "Bits/s (sum)": "Bits/s"
+            },
+            "excludeByName": {}
+          }
+        }
       ]
-    },
-    {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 18
-      },
-      "id": 200,
-      "panels": [],
-      "title": "dosd",
-      "type": "row"
     },
     {
       "datasource": {
@@ -600,15 +675,16 @@
             "barWidthFactor": 0.6
           },
           "min": 0,
-          "unit": "pps"
+          "unit": "short",
+          "displayName": "${__series.name}"
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 9,
         "w": 12,
-        "x": 0,
-        "y": 19
+        "x": 12,
+        "y": 1
       },
       "id": 6,
       "options": {
@@ -625,7 +701,7 @@
           "sort": "desc"
         }
       },
-      "title": "Top Attacks",
+      "title": "Top Attacks (Packets/s)",
       "type": "timeseries",
       "targets": [
         {
@@ -652,7 +728,7 @@
             },
             {
               "selector": "avg.packetRate",
-              "text": "Packets/s",
+              "text": "Rate",
               "type": "number"
             }
           ],
@@ -681,113 +757,6 @@
       ]
     },
     {
-      "datasource": {
-        "type": "yesoreyeram-infinity-datasource",
-        "uid": "${datasource}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "drawStyle": "bars",
-            "fillOpacity": 80,
-            "stacking": {
-              "group": "A",
-              "mode": "normal"
-            },
-            "lineWidth": 1,
-            "barWidthFactor": 0.6
-          },
-          "min": 0,
-          "unit": "pps"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 19
-      },
-      "id": 7,
-      "options": {
-        "legend": {
-          "calcs": [
-            "mean",
-            "max"
-          ],
-          "displayMode": "table",
-          "placement": "right"
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "title": "Drops by Reason",
-      "type": "timeseries",
-      "targets": [
-        {
-          "refId": "A",
-          "datasource": {
-            "type": "yesoreyeram-infinity-datasource",
-            "uid": "${datasource}"
-          },
-          "type": "graphql",
-          "source": "url",
-          "format": "dataframe",
-          "url": "https://api.cloudflare.com/client/v4/graphql",
-          "root_selector": "data.viewer.accounts.0.dosdNetworkAnalyticsAdaptiveGroups",
-          "columns": [
-            {
-              "selector": "dimensions.ts",
-              "text": "Time",
-              "type": "timestamp"
-            },
-            {
-              "selector": "dimensions.mitigationReason",
-              "text": "Reason",
-              "type": "string"
-            },
-            {
-              "selector": "dimensions.protocolState",
-              "text": "Protocol State",
-              "type": "string"
-            },
-            {
-              "selector": "avg.packetRate",
-              "text": "Packets/s",
-              "type": "number"
-            }
-          ],
-          "url_options": {
-            "method": "POST",
-            "params": [],
-            "headers": [],
-            "body_type": "graphql",
-            "body_content_type": "application/json",
-            "body_form": [],
-            "body_graphql_query": "query {\n  viewer {\n    accounts(filter: {accountTag: \"${accountTag}\"}) {\n      dosdNetworkAnalyticsAdaptiveGroups(\n        limit: 10000\n        filter: {\n          datetime_geq: \"${__from:date:iso}\"\n          datetime_lt: \"${__to:date:iso}\"\n          outcome: \"drop\"\n        }\n        orderBy: [datetime${timeBucket}_ASC, avg_packetRate${timeBucket}_DESC]\n      ) {\n        dimensions {\n          ts: datetime${timeBucket}\n          mitigationReason\n          protocolState\n        }\n        avg {\n          packetRate: packetRate${timeBucket}\n        }\n      }\n    }\n  }\n}",
-            "data": ""
-          }
-        }
-      ],
-      "transformations": [
-        {
-          "id": "partitionByValues",
-          "options": {
-            "fields": [
-              "Reason",
-              "Protocol State"
-            ],
-            "keepFields": false
-          }
-        }
-      ]
-    },
-    {
       "collapsed": false,
       "gridPos": {
         "h": 1,
@@ -795,9 +764,9 @@
         "x": 0,
         "y": 27
       },
-      "id": 300,
+      "id": 200,
       "panels": [],
-      "title": "flowtrackd",
+      "title": "Advanced TCP Protection",
       "type": "row"
     },
     {
@@ -821,7 +790,8 @@
             "barWidthFactor": 0.6
           },
           "min": 0,
-          "unit": "cps"
+          "unit": "short",
+          "displayName": "${__series.name}"
         },
         "overrides": []
       },
@@ -846,7 +816,7 @@
           "sort": "desc"
         }
       },
-      "title": "New TCP Connections by Destination Subnet",
+      "title": "New TCP Connections by Destination",
       "type": "timeseries",
       "targets": [
         {
@@ -873,7 +843,7 @@
             },
             {
               "selector": "avg.packetRate",
-              "text": "Connections/s",
+              "text": "Rate",
               "type": "number"
             }
           ],
@@ -884,7 +854,7 @@
             "body_type": "graphql",
             "body_content_type": "application/json",
             "body_form": [],
-            "body_graphql_query": "query {\n  viewer {\n    accounts(filter: {accountTag: \"${accountTag}\"}) {\n      flowtrackdNetworkAnalyticsAdaptiveGroups(\n        limit: 10000\n        filter: {\n          datetime_geq: \"${__from:date:iso}\"\n          datetime_lt: \"${__to:date:iso}\"\n          outcome: \"pass\"\n          protocolState: \"NEW\"\n        }\n        orderBy: [datetime${timeBucket}_ASC, avg_bitRate${timeBucket}_DESC]\n      ) {\n        dimensions {\n          ts: datetime${timeBucket}\n          ipDestinationSubnet\n        }\n        avg {\n          packetRate: packetRate${timeBucket}\n        }\n      }\n    }\n  }\n}",
+            "body_graphql_query": "query {\n  viewer {\n    accounts(filter: {accountTag: \"${accountTag}\"}) {\n      flowtrackdNetworkAnalyticsAdaptiveGroups(\n        limit: 10000\n        filter: {\n          datetime_geq: \"${__from:date:iso}\"\n          datetime_lt: \"${__to:date:iso}\"\n          outcome: \"pass\"\n        }\n        orderBy: [datetime${timeBucket}_ASC, avg_bitRate${timeBucket}_DESC]\n      ) {\n        dimensions {\n          ts: datetime${timeBucket}\n          ipDestinationSubnet\n        }\n        avg {\n          packetRate: packetRate${timeBucket}\n        }\n      }\n    }\n  }\n}",
             "data": ""
           }
         }
@@ -922,7 +892,8 @@
             "barWidthFactor": 0.6
           },
           "min": 0,
-          "unit": "cps"
+          "unit": "short",
+          "displayName": "${__series.name}"
         },
         "overrides": []
       },
@@ -931,6 +902,92 @@
         "w": 12,
         "x": 12,
         "y": 28
+      },
+      "id": 7,
+      "options": {
+        "legend": {
+          "calcs": ["mean", "max"],
+          "displayMode": "table",
+          "placement": "right"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "title": "Drops by Reason (Packets/s)",
+      "type": "timeseries",
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "${datasource}"
+          },
+          "type": "graphql",
+          "source": "url",
+          "format": "dataframe",
+          "url": "https://api.cloudflare.com/client/v4/graphql",
+          "root_selector": "data.viewer.accounts.0.dosdNetworkAnalyticsAdaptiveGroups",
+          "columns": [
+            { "selector": "dimensions.ts", "text": "Time", "type": "timestamp" },
+            { "selector": "dimensions.mitigationReason", "text": "Reason", "type": "string" },
+            { "selector": "dimensions.protocolState", "text": "Protocol State", "type": "string" },
+            { "selector": "avg.packetRate", "text": "Rate", "type": "number" }
+          ],
+          "url_options": {
+            "method": "POST",
+            "params": [],
+            "headers": [],
+            "body_type": "graphql",
+            "body_content_type": "application/json",
+            "body_form": [],
+            "body_graphql_query": "query {\n  viewer {\n    accounts(filter: {accountTag: \"${accountTag}\"}) {\n      dosdNetworkAnalyticsAdaptiveGroups(\n        limit: 10000\n        filter: {\n          datetime_geq: \"${__from:date:iso}\"\n          datetime_lt: \"${__to:date:iso}\"\n          outcome: \"drop\"\n        }\n        orderBy: [datetime${timeBucket}_ASC, avg_packetRate${timeBucket}_DESC]\n      ) {\n        dimensions {\n          ts: datetime${timeBucket}\n          mitigationReason\n          protocolState\n        }\n        avg {\n          packetRate: packetRate${timeBucket}\n        }\n      }\n    }\n  }\n}",
+            "data": ""
+          }
+        }
+      ],
+      "transformations": [
+        {
+          "id": "partitionByValues",
+          "options": {
+            "fields": ["Reason"],
+            "keepFields": false
+          }
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "lineWidth": 1,
+            "barWidthFactor": 0.6
+          },
+          "min": 0,
+          "unit": "short",
+          "displayName": "${__series.name}"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 36
       },
       "id": 9,
       "options": {
@@ -944,7 +1001,7 @@
           "sort": "desc"
         }
       },
-      "title": "Drops by Destination Subnet (flowtrackd)",
+      "title": "Drops by Destination and Reason (Connections/s)",
       "type": "timeseries",
       "targets": [
         {
@@ -976,7 +1033,7 @@
             },
             {
               "selector": "avg.packetRate",
-              "text": "Connections/s",
+              "text": "Rate",
               "type": "number"
             }
           ],
@@ -1000,7 +1057,10 @@
               "Destination Subnet",
               "Reason"
             ],
-            "keepFields": false
+            "keepFields": false,
+            "naming": {
+              "withNames": false
+            }
           }
         }
       ]
@@ -1011,7 +1071,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 36
+        "y": 44
       },
       "id": 400,
       "panels": [],
@@ -1039,7 +1099,8 @@
             "barWidthFactor": 0.6
           },
           "min": 0,
-          "unit": "pps"
+          "unit": "short",
+          "displayName": "${__series.name}"
         },
         "overrides": []
       },
@@ -1047,7 +1108,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 37
+        "y": 45
       },
       "id": 10,
       "options": {
@@ -1064,7 +1125,7 @@
           "sort": "desc"
         }
       },
-      "title": "Drops by Rule ID",
+      "title": "Drops by Rule ID (Packets/s)",
       "type": "timeseries",
       "targets": [
         {
@@ -1091,7 +1152,7 @@
             },
             {
               "selector": "avg.packetRate",
-              "text": "Packets/s",
+              "text": "Rate",
               "type": "number"
             }
           ],
@@ -1140,7 +1201,8 @@
             "barWidthFactor": 0.6
           },
           "min": 0,
-          "unit": "pps"
+          "unit": "short",
+          "displayName": "${__series.name}"
         },
         "overrides": []
       },
@@ -1148,7 +1210,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 37
+        "y": 45
       },
       "id": 11,
       "options": {
@@ -1165,7 +1227,7 @@
           "sort": "desc"
         }
       },
-      "title": "Drops by Destination Subnet (Magic Firewall)",
+      "title": "Drops by Destination (Packets/s)",
       "type": "timeseries",
       "targets": [
         {
@@ -1192,7 +1254,7 @@
             },
             {
               "selector": "avg.packetRate",
-              "text": "Packets/s",
+              "text": "Rate",
               "type": "number"
             }
           ],
@@ -1221,329 +1283,336 @@
       ]
     },
     {
-      "collapsed": false,
+      "collapsed": true,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 45
+        "y": 53
       },
       "id": 500,
-      "panels": [],
+      "panels": [
+        {
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "drawStyle": "bars",
+                "fillOpacity": 80,
+                "stacking": {
+                  "group": "A",
+                  "mode": "normal"
+                },
+                "lineWidth": 1,
+                "barWidthFactor": 0.6
+              },
+              "min": 0,
+              "unit": "short",
+              "displayName": "${__series.name}"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 46
+          },
+          "id": 12,
+          "options": {
+            "legend": {
+              "calcs": [
+                "mean",
+                "max"
+              ],
+              "displayMode": "table",
+              "placement": "right"
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "title": "Traffic by Destination IP (Packets/s)",
+          "type": "timeseries",
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "${datasource}"
+              },
+              "type": "graphql",
+              "source": "url",
+              "format": "dataframe",
+              "url": "https://api.cloudflare.com/client/v4/graphql",
+              "root_selector": "data.viewer.accounts.0.spectrumNetworkAnalyticsAdaptiveGroups",
+              "columns": [
+                {
+                  "selector": "dimensions.ts",
+                  "text": "Time",
+                  "type": "timestamp"
+                },
+                {
+                  "selector": "dimensions.ipDestinationAddress",
+                  "text": "Destination IP",
+                  "type": "string"
+                },
+                {
+                  "selector": "avg.packetRate",
+                  "text": "Rate",
+                  "type": "number"
+                }
+              ],
+              "url_options": {
+                "method": "POST",
+                "params": [],
+                "headers": [],
+                "body_type": "graphql",
+                "body_content_type": "application/json",
+                "body_form": [],
+                "body_graphql_query": "query {\n  viewer {\n    accounts(filter: {accountTag: \"${accountTag}\"}) {\n      spectrumNetworkAnalyticsAdaptiveGroups(\n        limit: 10000\n        filter: {\n          datetime_geq: \"${__from:date:iso}\"\n          datetime_lt: \"${__to:date:iso}\"\n          outcome: \"pass\"\n        }\n        orderBy: [datetime${timeBucket}_ASC, avg_packetRate${timeBucket}_DESC]\n      ) {\n        dimensions {\n          ts: datetime${timeBucket}\n          ipDestinationAddress\n        }\n        avg {\n          packetRate: packetRate${timeBucket}\n        }\n      }\n    }\n  }\n}",
+                "data": ""
+              }
+            }
+          ],
+          "transformations": [
+            {
+              "id": "partitionByValues",
+              "options": {
+                "fields": [
+                  "Destination IP"
+                ],
+                "keepFields": false
+              }
+            }
+          ]
+        },
+        {
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "drawStyle": "bars",
+                "fillOpacity": 80,
+                "stacking": {
+                  "group": "A",
+                  "mode": "normal"
+                },
+                "lineWidth": 1,
+                "barWidthFactor": 0.6
+              },
+              "min": 0,
+              "unit": "short",
+              "displayName": "${__series.name}"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 46
+          },
+          "id": 13,
+          "options": {
+            "legend": {
+              "calcs": [
+                "mean",
+                "max"
+              ],
+              "displayMode": "table",
+              "placement": "right"
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "title": "Traffic by Destination IP (Bits/s)",
+          "type": "timeseries",
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "${datasource}"
+              },
+              "type": "graphql",
+              "source": "url",
+              "format": "dataframe",
+              "url": "https://api.cloudflare.com/client/v4/graphql",
+              "root_selector": "data.viewer.accounts.0.spectrumNetworkAnalyticsAdaptiveGroups",
+              "columns": [
+                {
+                  "selector": "dimensions.ts",
+                  "text": "Time",
+                  "type": "timestamp"
+                },
+                {
+                  "selector": "dimensions.ipDestinationAddress",
+                  "text": "Destination IP",
+                  "type": "string"
+                },
+                {
+                  "selector": "avg.bitRate",
+                  "text": "Rate",
+                  "type": "number"
+                }
+              ],
+              "url_options": {
+                "method": "POST",
+                "params": [],
+                "headers": [],
+                "body_type": "graphql",
+                "body_content_type": "application/json",
+                "body_form": [],
+                "body_graphql_query": "query {\n  viewer {\n    accounts(filter: {accountTag: \"${accountTag}\"}) {\n      spectrumNetworkAnalyticsAdaptiveGroups(\n        limit: 10000\n        filter: {\n          datetime_geq: \"${__from:date:iso}\"\n          datetime_lt: \"${__to:date:iso}\"\n          outcome: \"pass\"\n        }\n        orderBy: [datetime${timeBucket}_ASC, avg_bitRate${timeBucket}_DESC]\n      ) {\n        dimensions {\n          ts: datetime${timeBucket}\n          ipDestinationAddress\n        }\n        avg {\n          bitRate: bitRate${timeBucket}\n        }\n      }\n    }\n  }\n}",
+                "data": ""
+              }
+            }
+          ],
+          "transformations": [
+            {
+              "id": "partitionByValues",
+              "options": {
+                "fields": [
+                  "Destination IP"
+                ],
+                "keepFields": false
+              }
+            }
+          ]
+        },
+        {
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "drawStyle": "bars",
+                "fillOpacity": 80,
+                "stacking": {
+                  "group": "A",
+                  "mode": "normal"
+                },
+                "lineWidth": 1,
+                "barWidthFactor": 0.6
+              },
+              "min": 0,
+              "unit": "short",
+              "displayName": "${__series.name}"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 54
+          },
+          "id": 14,
+          "options": {
+            "legend": {
+              "calcs": [
+                "mean",
+                "max"
+              ],
+              "displayMode": "table",
+              "placement": "right"
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "title": "Drops by Destination IP (Packets/s)",
+          "type": "timeseries",
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "${datasource}"
+              },
+              "type": "graphql",
+              "source": "url",
+              "format": "dataframe",
+              "url": "https://api.cloudflare.com/client/v4/graphql",
+              "root_selector": "data.viewer.accounts.0.spectrumNetworkAnalyticsAdaptiveGroups",
+              "columns": [
+                {
+                  "selector": "dimensions.ts",
+                  "text": "Time",
+                  "type": "timestamp"
+                },
+                {
+                  "selector": "dimensions.ipDestinationAddress",
+                  "text": "Destination IP",
+                  "type": "string"
+                },
+                {
+                  "selector": "dimensions.mitigationSystem",
+                  "text": "Mitigation System",
+                  "type": "string"
+                },
+                {
+                  "selector": "avg.packetRate",
+                  "text": "Rate",
+                  "type": "number"
+                }
+              ],
+              "url_options": {
+                "method": "POST",
+                "params": [],
+                "headers": [],
+                "body_type": "graphql",
+                "body_content_type": "application/json",
+                "body_form": [],
+                "body_graphql_query": "query {\n  viewer {\n    accounts(filter: {accountTag: \"${accountTag}\"}) {\n      spectrumNetworkAnalyticsAdaptiveGroups(\n        limit: 10000\n        filter: {\n          datetime_geq: \"${__from:date:iso}\"\n          datetime_lt: \"${__to:date:iso}\"\n          outcome: \"drop\"\n        }\n        orderBy: [datetime${timeBucket}_ASC, avg_packetRate${timeBucket}_DESC]\n      ) {\n        dimensions {\n          ts: datetime${timeBucket}\n          ipDestinationAddress\n          mitigationSystem\n        }\n        avg {\n          packetRate: packetRate${timeBucket}\n        }\n      }\n    }\n  }\n}",
+                "data": ""
+              }
+            }
+          ],
+          "transformations": [
+            {
+              "id": "partitionByValues",
+              "options": {
+                "fields": [
+                  "Destination IP",
+                  "Mitigation System"
+                ],
+                "keepFields": false,
+                "naming": {
+                  "withNames": false
+                }
+              }
+            }
+          ]
+        }
+      ],
       "title": "Spectrum",
       "type": "row"
-    },
-    {
-      "datasource": {
-        "type": "yesoreyeram-infinity-datasource",
-        "uid": "${datasource}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "drawStyle": "bars",
-            "fillOpacity": 80,
-            "stacking": {
-              "group": "A",
-              "mode": "normal"
-            },
-            "lineWidth": 1,
-            "barWidthFactor": 0.6
-          },
-          "min": 0,
-          "unit": "pps"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 46
-      },
-      "id": 12,
-      "options": {
-        "legend": {
-          "calcs": [
-            "mean",
-            "max"
-          ],
-          "displayMode": "table",
-          "placement": "right"
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "title": "Spectrum Traffic by Destination IP (Packets)",
-      "type": "timeseries",
-      "targets": [
-        {
-          "refId": "A",
-          "datasource": {
-            "type": "yesoreyeram-infinity-datasource",
-            "uid": "${datasource}"
-          },
-          "type": "graphql",
-          "source": "url",
-          "format": "dataframe",
-          "url": "https://api.cloudflare.com/client/v4/graphql",
-          "root_selector": "data.viewer.accounts.0.spectrumNetworkAnalyticsAdaptiveGroups",
-          "columns": [
-            {
-              "selector": "dimensions.ts",
-              "text": "Time",
-              "type": "timestamp"
-            },
-            {
-              "selector": "dimensions.ipDestinationAddress",
-              "text": "Destination IP",
-              "type": "string"
-            },
-            {
-              "selector": "avg.packetRate",
-              "text": "Packets/s",
-              "type": "number"
-            }
-          ],
-          "url_options": {
-            "method": "POST",
-            "params": [],
-            "headers": [],
-            "body_type": "graphql",
-            "body_content_type": "application/json",
-            "body_form": [],
-            "body_graphql_query": "query {\n  viewer {\n    accounts(filter: {accountTag: \"${accountTag}\"}) {\n      spectrumNetworkAnalyticsAdaptiveGroups(\n        limit: 10000\n        filter: {\n          datetime_geq: \"${__from:date:iso}\"\n          datetime_lt: \"${__to:date:iso}\"\n          outcome: \"pass\"\n        }\n        orderBy: [datetime${timeBucket}_ASC, avg_packetRate${timeBucket}_DESC]\n      ) {\n        dimensions {\n          ts: datetime${timeBucket}\n          ipDestinationAddress\n        }\n        avg {\n          packetRate: packetRate${timeBucket}\n        }\n      }\n    }\n  }\n}",
-            "data": ""
-          }
-        }
-      ],
-      "transformations": [
-        {
-          "id": "partitionByValues",
-          "options": {
-            "fields": [
-              "Destination IP"
-            ],
-            "keepFields": false
-          }
-        }
-      ]
-    },
-    {
-      "datasource": {
-        "type": "yesoreyeram-infinity-datasource",
-        "uid": "${datasource}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "drawStyle": "bars",
-            "fillOpacity": 80,
-            "stacking": {
-              "group": "A",
-              "mode": "normal"
-            },
-            "lineWidth": 1,
-            "barWidthFactor": 0.6
-          },
-          "min": 0,
-          "unit": "bps"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 46
-      },
-      "id": 13,
-      "options": {
-        "legend": {
-          "calcs": [
-            "mean",
-            "max"
-          ],
-          "displayMode": "table",
-          "placement": "right"
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "title": "Spectrum Traffic by Destination IP (Bits)",
-      "type": "timeseries",
-      "targets": [
-        {
-          "refId": "A",
-          "datasource": {
-            "type": "yesoreyeram-infinity-datasource",
-            "uid": "${datasource}"
-          },
-          "type": "graphql",
-          "source": "url",
-          "format": "dataframe",
-          "url": "https://api.cloudflare.com/client/v4/graphql",
-          "root_selector": "data.viewer.accounts.0.spectrumNetworkAnalyticsAdaptiveGroups",
-          "columns": [
-            {
-              "selector": "dimensions.ts",
-              "text": "Time",
-              "type": "timestamp"
-            },
-            {
-              "selector": "dimensions.ipDestinationAddress",
-              "text": "Destination IP",
-              "type": "string"
-            },
-            {
-              "selector": "avg.bitRate",
-              "text": "Bits/s",
-              "type": "number"
-            }
-          ],
-          "url_options": {
-            "method": "POST",
-            "params": [],
-            "headers": [],
-            "body_type": "graphql",
-            "body_content_type": "application/json",
-            "body_form": [],
-            "body_graphql_query": "query {\n  viewer {\n    accounts(filter: {accountTag: \"${accountTag}\"}) {\n      spectrumNetworkAnalyticsAdaptiveGroups(\n        limit: 10000\n        filter: {\n          datetime_geq: \"${__from:date:iso}\"\n          datetime_lt: \"${__to:date:iso}\"\n          outcome: \"pass\"\n        }\n        orderBy: [datetime${timeBucket}_ASC, avg_bitRate${timeBucket}_DESC]\n      ) {\n        dimensions {\n          ts: datetime${timeBucket}\n          ipDestinationAddress\n        }\n        avg {\n          bitRate: bitRate${timeBucket}\n        }\n      }\n    }\n  }\n}",
-            "data": ""
-          }
-        }
-      ],
-      "transformations": [
-        {
-          "id": "partitionByValues",
-          "options": {
-            "fields": [
-              "Destination IP"
-            ],
-            "keepFields": false
-          }
-        }
-      ]
-    },
-    {
-      "datasource": {
-        "type": "yesoreyeram-infinity-datasource",
-        "uid": "${datasource}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "drawStyle": "bars",
-            "fillOpacity": 80,
-            "stacking": {
-              "group": "A",
-              "mode": "normal"
-            },
-            "lineWidth": 1,
-            "barWidthFactor": 0.6
-          },
-          "min": 0,
-          "unit": "pps"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 54
-      },
-      "id": 14,
-      "options": {
-        "legend": {
-          "calcs": [
-            "mean",
-            "max"
-          ],
-          "displayMode": "table",
-          "placement": "right"
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "title": "Spectrum Drops by Destination IP",
-      "type": "timeseries",
-      "targets": [
-        {
-          "refId": "A",
-          "datasource": {
-            "type": "yesoreyeram-infinity-datasource",
-            "uid": "${datasource}"
-          },
-          "type": "graphql",
-          "source": "url",
-          "format": "dataframe",
-          "url": "https://api.cloudflare.com/client/v4/graphql",
-          "root_selector": "data.viewer.accounts.0.spectrumNetworkAnalyticsAdaptiveGroups",
-          "columns": [
-            {
-              "selector": "dimensions.ts",
-              "text": "Time",
-              "type": "timestamp"
-            },
-            {
-              "selector": "dimensions.ipDestinationAddress",
-              "text": "Destination IP",
-              "type": "string"
-            },
-            {
-              "selector": "dimensions.mitigationSystem",
-              "text": "Mitigation System",
-              "type": "string"
-            },
-            {
-              "selector": "avg.packetRate",
-              "text": "Packets/s",
-              "type": "number"
-            }
-          ],
-          "url_options": {
-            "method": "POST",
-            "params": [],
-            "headers": [],
-            "body_type": "graphql",
-            "body_content_type": "application/json",
-            "body_form": [],
-            "body_graphql_query": "query {\n  viewer {\n    accounts(filter: {accountTag: \"${accountTag}\"}) {\n      spectrumNetworkAnalyticsAdaptiveGroups(\n        limit: 10000\n        filter: {\n          datetime_geq: \"${__from:date:iso}\"\n          datetime_lt: \"${__to:date:iso}\"\n          outcome: \"drop\"\n        }\n        orderBy: [datetime${timeBucket}_ASC, avg_packetRate${timeBucket}_DESC]\n      ) {\n        dimensions {\n          ts: datetime${timeBucket}\n          ipDestinationAddress\n          mitigationSystem\n        }\n        avg {\n          packetRate: packetRate${timeBucket}\n        }\n      }\n    }\n  }\n}",
-            "data": ""
-          }
-        }
-      ],
-      "transformations": [
-        {
-          "id": "partitionByValues",
-          "options": {
-            "fields": [
-              "Destination IP",
-              "Mitigation System"
-            ],
-            "keepFields": false
-          }
-        }
-      ]
     }
   ],
-  "refresh": "",
+  "refresh": "auto",
   "schemaVersion": 39,
   "tags": [
     "cloudflare",
@@ -1572,14 +1641,14 @@
       },
       {
         "current": {
-          "selected": false,
-          "text": "",
-          "value": ""
+          "selected": true,
+          "text": "a63cde259a3885edc49f32101b68379a",
+          "value": "a63cde259a3885edc49f32101b68379a"
         },
         "hide": 0,
         "label": "Account Tag",
         "name": "accountTag",
-        "query": "",
+        "query": "a63cde259a3885edc49f32101b68379a",
         "skipUrlSync": false,
         "type": "textbox"
       },
@@ -1672,14 +1741,12 @@
     ]
   },
   "time": {
-    "from": "now-4h",
-    "to": "now-2m"
+    "from": "now-30m",
+    "to": "now"
   },
-  "timepicker": {
-    "nowDelay": "2m"
-  },
+  "timepicker": {},
   "timezone": "",
   "title": "Cloudflare Network Analytics",
   "uid": "cf-network-analytics",
-  "version": 1
+  "version": 2
 }

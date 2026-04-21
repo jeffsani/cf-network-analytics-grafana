@@ -9,7 +9,7 @@ interface Env {
 
 export class GrafanaContainer extends Container {
   defaultPort = 3000;
-  sleepAfter = "30m";
+  sleepAfter = "4h";
   envVars = {
     CF_API_TOKEN: env.CF_API_TOKEN,
     GF_SECURITY_ADMIN_PASSWORD: env.GF_SECURITY_ADMIN_PASSWORD,
@@ -31,6 +31,7 @@ export class GrafanaContainer extends Container {
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const container = getContainer(env.GRAFANA, "grafana");
+    await container.startAndWaitForPorts();
     return container.fetch(request);
   },
 };

@@ -8,6 +8,7 @@ providers:
     disableDeletion: false
     editable: true
     updateIntervalSeconds: 30
+    allowUiUpdates: true
     options:
       path: /etc/grafana/provisioning/dashboards
       foldersFromFilesStructure: false

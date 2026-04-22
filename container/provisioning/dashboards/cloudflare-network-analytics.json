@@ -102,6 +102,7 @@
           "sort": "desc"
         }
       },
+      "description": "Passed traffic grouped by destination subnet. Helps identify which prefixes are receiving the most traffic.",
       "title": "Traffic by Destination Prefix (Packets/s)",
       "type": "timeseries",
       "targets": [
@@ -223,6 +224,7 @@
           "sort": "desc"
         }
       },
+      "description": "Same as Packets/s but measured in bits per second. Useful for bandwidth capacity planning.",
       "title": "Traffic by Destination Prefix (Bits/s)",
       "type": "timeseries",
       "targets": [
@@ -321,6 +323,7 @@
           "mode": "single"
         }
       },
+      "description": "Top N source autonomous systems by packet count. Identifies which networks are sending the most traffic to your prefixes.",
       "title": "Top Source ASNs (Packets/s)",
       "type": "piechart",
       "targets": [
@@ -439,6 +442,7 @@
           "mode": "single"
         }
       },
+      "description": "Top N source countries by packet count. Shows the geographic distribution of traffic hitting your network.",
       "title": "Top Source Countries (Packets/s)",
       "type": "piechart",
       "targets": [
@@ -654,6 +658,7 @@
           "maxZoom": 18
         }
       },
+      "description": "Geographic heatmap of traffic volume across Cloudflare colos. Colos are grouped by geohash to de-duplicate co-located facilities.",
       "title": "Colo Heatmap",
       "type": "geomap",
       "targets": [
@@ -832,6 +837,7 @@
           "sort": "desc"
         }
       },
+      "description": "Top dropped attacks from dosd, grouped by attack vector and attack ID. Only shows traffic with a non-empty attack ID.",
       "title": "Top Attacks (Packets/s)",
       "type": "timeseries",
       "targets": [
@@ -969,6 +975,7 @@
               "sort": "desc"
             }
           },
+          "description": "Passed (non-dropped) traffic grouped by IP protocol (TCP, UDP, ICMP, etc.). Shows the protocol mix of legitimate traffic.",
           "title": "Passed Traffic by Protocol (Packets/s)",
           "type": "timeseries",
           "targets": [
@@ -1090,6 +1097,7 @@
               "sort": "desc"
             }
           },
+          "description": "Same as Packets/s but measured in bits per second. Useful for seeing which protocols consume the most bandwidth.",
           "title": "Passed Traffic by Protocol (Bits/s)",
           "type": "timeseries",
           "targets": [
@@ -1193,6 +1201,7 @@
               "sort": "desc"
             }
           },
+          "description": "Dropped traffic grouped by the mitigation system that blocked it (dosd, flowtrackd, Magic Firewall, etc.).",
           "title": "Dropped Traffic Rates By Mitigation System (Packets/s)",
           "type": "timeseries",
           "targets": [
@@ -1296,6 +1305,7 @@
               "sort": "desc"
             }
           },
+          "description": "Same as Packets/s but measured in bits per second. Shows the bandwidth impact of each mitigation system.",
           "title": "Dropped Bit Rates By Mitigation System (Bits/s)",
           "type": "timeseries",
           "targets": [
@@ -1413,6 +1423,7 @@
               "sort": "desc"
             }
           },
+          "description": "New TCP connections allowed through flowtrackd, grouped by destination subnet. Shows legitimate connection volume per prefix.",
           "title": "New TCP Connections by Destination",
           "type": "timeseries",
           "targets": [
@@ -1516,6 +1527,7 @@
               "sort": "desc"
             }
           },
+          "description": "Packets dropped by dosd grouped by mitigation reason and protocol state. Shows why traffic is being blocked.",
           "title": "Drops by Mitigation Reason (Packets/s)",
           "type": "timeseries",
           "targets": [
@@ -1620,6 +1632,7 @@
               "sort": "desc"
             }
           },
+          "description": "SYN cookie challenge events grouped by destination and reason. CHALLENGE_NEEDED = challenge issued, CHALLENGE_PASSED = client completed the handshake.",
           "title": "TCP Challenge Activity by Destination (Connections/s)",
           "type": "timeseries",
           "targets": [
@@ -1750,6 +1763,7 @@
               "sort": "desc"
             }
           },
+          "description": "CHALLENGE_NEEDED vs CHALLENGE_PASSED over time. A high ratio of needed-to-passed suggests spoofed SYN floods — spoofed sources cannot complete the SYN cookie handshake.",
           "title": "Challenge Success Rate (Connections/s)",
           "type": "timeseries",
           "targets": [
@@ -1848,6 +1862,7 @@
               "mode": "single"
             }
           },
+          "description": "Top source IPs triggering the most SYN cookie challenges. Useful for identifying repeat offenders or spoofed source addresses.",
           "title": "Top Challenged Source IPs",
           "type": "piechart",
           "targets": [
@@ -1984,6 +1999,7 @@
               "sort": "desc"
             }
           },
+          "description": "Packets dropped by Magic Firewall grouped by rule ID. Identify which firewall rules are triggering most frequently.",
           "title": "Drops by Rule ID (Packets/s)",
           "type": "timeseries",
           "targets": [
@@ -2087,6 +2103,7 @@
               "sort": "desc"
             }
           },
+          "description": "Packets dropped by Magic Firewall grouped by destination subnet. Shows which prefixes are targeted by blocked traffic.",
           "title": "Drops by Destination (Packets/s)",
           "type": "timeseries",
           "targets": [
@@ -2205,6 +2222,7 @@
               "sort": "desc"
             }
           },
+          "description": "Spectrum traffic grouped by destination IP. Shows packet rate distribution across Spectrum-protected origins.",
           "title": "Traffic by Destination IP (Packets/s)",
           "type": "timeseries",
           "targets": [
@@ -2309,6 +2327,7 @@
               "sort": "desc"
             }
           },
+          "description": "Same as Packets/s but measured in bits per second. Shows bandwidth consumption per Spectrum origin.",
           "title": "Traffic by Destination IP (Bits/s)",
           "type": "timeseries",
           "targets": [
@@ -2413,6 +2432,7 @@
               "sort": "desc"
             }
           },
+          "description": "Spectrum traffic dropped by destination IP. Shows which origins are receiving the most blocked traffic.",
           "title": "Drops by Destination IP (Packets/s)",
           "type": "timeseries",
           "targets": [
@@ -2539,6 +2559,7 @@
               "sort": "desc"
             }
           },
+          "description": "Packets with the IP moreFragments flag set over time. Spikes may indicate fragmentation-based attacks or MTU issues.",
           "title": "Fragmented Packet Rate (Packets/s)",
           "type": "timeseries",
           "targets": [
@@ -2661,6 +2682,7 @@
               "sort": "desc"
             }
           },
+          "description": "Same as Packets/s but measured in bits per second. Shows the bandwidth impact of fragmented traffic.",
           "title": "Fragmented Traffic Rate (Bits/s)",
           "type": "timeseries",
           "targets": [
@@ -2783,6 +2805,7 @@
               "sort": "desc"
             }
           },
+          "description": "ICMP type 3 code 4 (Destination Unreachable / Fragmentation Needed) packets. These are Path MTU Discovery messages — sustained high rates may indicate MTU black holes.",
           "title": "ICMP \"Fragmentation Needed\" Rate (Packets/s)",
           "type": "timeseries",
           "targets": [
@@ -2866,6 +2889,7 @@
               "mode": "single"
             }
           },
+          "description": "Top source IPs sending packets with the IP moreFragments flag set. Helps identify sources of fragmented traffic.",
           "title": "Top Source IPs Sending Fragments",
           "type": "piechart",
           "targets": [

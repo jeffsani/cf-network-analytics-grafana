@@ -914,14 +914,32 @@
                 "mode": "palette-classic"
               },
               "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
                 "drawStyle": "bars",
                 "fillOpacity": 80,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineWidth": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
                 "stacking": {
                   "group": "A",
                   "mode": "normal"
                 },
-                "lineWidth": 1,
-                "barWidthFactor": 0.6
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               },
               "min": 0,
               "unit": "pps"
@@ -937,16 +955,21 @@
           "id": 15,
           "options": {
             "legend": {
-              "calcs": [],
-              "displayMode": "hidden",
-              "placement": "bottom"
+              "calcs": [
+                "mean",
+                "max"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "sortBy": "Max",
+              "sortDesc": true
             },
             "tooltip": {
               "mode": "multi",
               "sort": "desc"
             }
           },
-          "title": "Passed Traffic Rate (Packets/s)",
+          "title": "Passed Traffic by Protocol (Packets/s)",
           "type": "timeseries",
           "targets": [
             {
@@ -967,8 +990,13 @@
                   "type": "timestamp"
                 },
                 {
+                  "selector": "dimensions.ipProtocolName",
+                  "text": "Protocol",
+                  "type": "string"
+                },
+                {
                   "selector": "avg.packetRate",
-                  "text": "Passed",
+                  "text": " ",
                   "type": "number"
                 }
               ],
@@ -979,16 +1007,19 @@
                 "body_type": "graphql",
                 "body_content_type": "application/json",
                 "body_form": [],
-                "body_graphql_query": "query {\n  viewer {\n    accounts(filter: {accountTag: \"${accountTag}\"}) {\n      magicTransitNetworkAnalyticsAdaptiveGroups(\n        limit: 10000\n        filter: {\n          datetime_geq: \"${__from:date:iso}\"\n          datetime_lt: \"${__to:date:iso}\"\n          outcome: \"pass\"\n        }\n        orderBy: [datetime${timeBucket}_ASC]\n      ) {\n        dimensions {\n          ts: datetime${timeBucket}\n        }\n        avg {\n          packetRate: packetRate${timeBucket}\n        }\n      }\n    }\n  }\n}",
+                "body_graphql_query": "query {\n  viewer {\n    accounts(filter: {accountTag: \"${accountTag}\"}) {\n      magicTransitNetworkAnalyticsAdaptiveGroups(\n        limit: 10000\n        filter: {\n          datetime_geq: \"${__from:date:iso}\"\n          datetime_lt: \"${__to:date:iso}\"\n          outcome: \"pass\"\n        }\n        orderBy: [datetime${timeBucket}_ASC, avg_packetRate${timeBucket}_DESC]\n      ) {\n        dimensions {\n          ts: datetime${timeBucket}\n          ipProtocolName\n        }\n        avg {\n          packetRate: packetRate${timeBucket}\n        }\n      }\n    }\n  }\n}",
                 "data": ""
               }
             }
           ],
           "transformations": [
             {
-              "id": "prepareTimeSeries",
+              "id": "partitionByValues",
               "options": {
-                "format": "multi"
+                "fields": [
+                  "Protocol"
+                ],
+                "keepFields": false
               }
             }
           ]
@@ -1004,14 +1035,32 @@
                 "mode": "palette-classic"
               },
               "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
                 "drawStyle": "bars",
                 "fillOpacity": 80,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineWidth": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
                 "stacking": {
                   "group": "A",
                   "mode": "normal"
                 },
-                "lineWidth": 1,
-                "barWidthFactor": 0.6
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               },
               "min": 0,
               "unit": "bps"
@@ -1027,16 +1076,21 @@
           "id": 16,
           "options": {
             "legend": {
-              "calcs": [],
-              "displayMode": "hidden",
-              "placement": "bottom"
+              "calcs": [
+                "mean",
+                "max"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "sortBy": "Max",
+              "sortDesc": true
             },
             "tooltip": {
               "mode": "multi",
               "sort": "desc"
             }
           },
-          "title": "Passed Traffic Rate (Bits/s)",
+          "title": "Passed Traffic by Protocol (Bits/s)",
           "type": "timeseries",
           "targets": [
             {
@@ -1057,8 +1111,13 @@
                   "type": "timestamp"
                 },
                 {
+                  "selector": "dimensions.ipProtocolName",
+                  "text": "Protocol",
+                  "type": "string"
+                },
+                {
                   "selector": "avg.bitRate",
-                  "text": "Passed",
+                  "text": " ",
                   "type": "number"
                 }
               ],
@@ -1069,16 +1128,19 @@
                 "body_type": "graphql",
                 "body_content_type": "application/json",
                 "body_form": [],
-                "body_graphql_query": "query {\n  viewer {\n    accounts(filter: {accountTag: \"${accountTag}\"}) {\n      magicTransitNetworkAnalyticsAdaptiveGroups(\n        limit: 10000\n        filter: {\n          datetime_geq: \"${__from:date:iso}\"\n          datetime_lt: \"${__to:date:iso}\"\n          outcome: \"pass\"\n        }\n        orderBy: [datetime${timeBucket}_ASC]\n      ) {\n        dimensions {\n          ts: datetime${timeBucket}\n        }\n        avg {\n          bitRate: bitRate${timeBucket}\n        }\n      }\n    }\n  }\n}",
+                "body_graphql_query": "query {\n  viewer {\n    accounts(filter: {accountTag: \"${accountTag}\"}) {\n      magicTransitNetworkAnalyticsAdaptiveGroups(\n        limit: 10000\n        filter: {\n          datetime_geq: \"${__from:date:iso}\"\n          datetime_lt: \"${__to:date:iso}\"\n          outcome: \"pass\"\n        }\n        orderBy: [datetime${timeBucket}_ASC, avg_bitRate${timeBucket}_DESC]\n      ) {\n        dimensions {\n          ts: datetime${timeBucket}\n          ipProtocolName\n        }\n        avg {\n          bitRate: bitRate${timeBucket}\n        }\n      }\n    }\n  }\n}",
                 "data": ""
               }
             }
           ],
           "transformations": [
             {
-              "id": "prepareTimeSeries",
+              "id": "partitionByValues",
               "options": {
-                "format": "multi"
+                "fields": [
+                  "Protocol"
+                ],
+                "keepFields": false
               }
             }
           ]
@@ -1558,7 +1620,7 @@
               "sort": "desc"
             }
           },
-          "title": "Drops by Destination and Reason (Connections/s)",
+          "title": "TCP Challenge Activity by Destination (Connections/s)",
           "type": "timeseries",
           "targets": [
             {

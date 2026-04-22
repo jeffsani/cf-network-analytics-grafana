@@ -1,27 +1,96 @@
 # Cloudflare Network Analytics — Grafana Dashboard
 
+![alt text](image.png)
+
 A modern Grafana dashboard for **Cloudflare Network Analytics (NAv2)**, deployed as a **Cloudflare Worker Container** and protected by **Cloudflare Access**.
 
-Uses the [Grafana Infinity datasource plugin](https://grafana.com/grafana/plugins/yesoreyeram-infinity-datasource/) to query the Cloudflare GraphQL Analytics API directly.
+Uses the [Grafana Infinity datasource plugin](https://grafana.com/grafana/plugins/yesoreyeram-infinity-datasource/) to query the Cloudflare GraphQL Analytics API directly. The dashboard opens in **kiosk mode** by default (no Grafana chrome) with a **24-hour** time window.
 
-## Dashboard Sections
+---
 
-| Section | Data Source (GraphQL Node) | Panels |
-|---------|---------------------------|--------|
-| **Overview** | `magicTransitNetworkAnalyticsAdaptiveGroups` | Traffic by Dest Subnet (packets + bits), Top Source ASNs, Top Source Countries, Colo Heatmap |
-| **dosd** | `dosdNetworkAnalyticsAdaptiveGroups` | Top Attacks, Drops by Reason |
-| **flowtrackd** | `flowtrackdNetworkAnalyticsAdaptiveGroups` | New TCP Connections by Dest Subnet, Drops by Dest Subnet |
-| **Magic Firewall** | `magicFirewallNetworkAnalyticsAdaptiveGroups` | Drops by Rule ID, Drops by Dest Subnet |
-| **Spectrum** | `spectrumNetworkAnalyticsAdaptiveGroups` | Traffic by Dest IP (packets + bits), Drops by Dest IP |
+## Dashboard Panels
+
+### Overview (expanded by default)
+
+| Panel | Type | Description |
+|-------|------|-------------|
+| Colo Heatmap | Geomap | Geographic heatmap of traffic volume across Cloudflare colos, grouped by geohash to de-duplicate co-located colos |
+| Top Attacks (Packets/s) | Timeseries | Top dropped attack timeseries grouped by Attack Vector and Attack ID |
+| Top Source ASNs (Packets/s) | Pie chart | Top N source ASNs by packet rate |
+| Top Source Countries (Packets/s) | Pie chart | Top N source countries by packet rate |
+| Passed Traffic by Protocol (Packets/s) | Timeseries | Passed traffic grouped by IP protocol (TCP, UDP, etc.) — stacked bars |
+| Passed Traffic by Protocol (Bits/s) | Timeseries | Same as above in bits per second |
+| Traffic by Destination Prefix (Packets/s) | Timeseries | All passed traffic grouped by destination subnet — stacked bars |
+| Traffic by Destination Prefix (Bits/s) | Timeseries | Same as above in bits per second |
+
+### Traffic Statistics (collapsed)
+
+| Panel | Type | Description |
+|-------|------|-------------|
+| Dropped Traffic Rates By Mitigation System (Packets/s) | Timeseries | Dropped traffic grouped by mitigation system — stacked bars |
+| Dropped Bit Rates By Mitigation System (Bits/s) | Timeseries | Same as above in bits per second |
+
+### Advanced TCP Protection (collapsed)
+
+| Panel | Type | Description |
+|-------|------|-------------|
+| New TCP Connections by Destination | Timeseries | New TCP connections grouped by destination subnet |
+| Drops by Reason (Packets/s) | Timeseries | flowtrackd drops grouped by drop reason |
+| TCP Challenge Activity by Destination (Connections/s) | Timeseries | SYN cookie challenge events (CHALLENGE_NEEDED + CHALLENGE_PASSED) grouped by destination and reason |
+
+### Magic Firewall (collapsed)
+
+| Panel | Type | Description |
+|-------|------|-------------|
+| Drops by Rule ID (Packets/s) | Timeseries | Magic Firewall drops grouped by rule ID |
+| Drops by Destination (Packets/s) | Timeseries | Magic Firewall drops grouped by destination subnet |
+
+### Spectrum (collapsed)
+
+| Panel | Type | Description |
+|-------|------|-------------|
+| Traffic by Destination IP (Packets/s) | Timeseries | Spectrum traffic grouped by destination IP |
+| Traffic by Destination IP (Bits/s) | Timeseries | Same as above in bits per second |
+| Drops by Destination IP (Packets/s) | Timeseries | Spectrum drops grouped by destination IP |
+
+### Diagnostics (collapsed)
+
+| Panel | Type | Description |
+|-------|------|-------------|
+| Fragmented Packet Rate (Packets/s) | Timeseries | Packets with IP `moreFragments` flag set |
+| Fragmented Traffic Rate (Bits/s) | Timeseries | Same as above in bits per second |
+| ICMP "Fragmentation Needed" Rate (Packets/s) | Timeseries | ICMP type 3 code 4 (Path MTU Discovery) packets |
+| Top Source ASNs Sending Fragments | Pie chart | Top N source ASNs sending fragmented traffic |
+
+### GraphQL Data Sources
+
+| Section | GraphQL Node |
+|---------|-------------|
+| Overview, Traffic Statistics, Diagnostics | `magicTransitNetworkAnalyticsAdaptiveGroups` |
+| Top Attacks | `dosdNetworkAnalyticsAdaptiveGroups` |
+| Advanced TCP Protection | `flowtrackdNetworkAnalyticsAdaptiveGroups` |
+| Magic Firewall | `magicFirewallNetworkAnalyticsAdaptiveGroups` |
+| Spectrum | `spectrumNetworkAnalyticsAdaptiveGroups` |
+
+### Dashboard Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `datasource` | Infinity datasource instance | Cloudflare GraphQL |
+| `accountTag` | Cloudflare Account ID | — |
+| `timeBucket` | Aggregation granularity | FiveMinutes |
+| `topN` | Number of items in pie charts | 10 |
+
+---
 
 ## Project Structure
 
 ```
 ├── README.md
 ├── src/
-│   └── index.ts                       # Worker entrypoint (proxies requests to Grafana)
+│   └── index.ts                       # Worker entrypoint — kiosk redirect + edge caching + proxy
 ├── container/
-│   ├── Dockerfile                     # Grafana OSS + Infinity plugin
+│   ├── Dockerfile                     # Grafana OSS 11.6 + Infinity plugin
 │   └── provisioning/
 │       ├── datasources/
 │       │   └── cloudflare-graphql.yaml  # Infinity datasource (auto-provisioned)
@@ -34,6 +103,26 @@ Uses the [Grafana Infinity datasource plugin](https://grafana.com/grafana/plugin
 ├── .dev.vars.example                  # Template for local secrets
 └── .gitignore
 ```
+
+---
+
+## Architecture
+
+```
+User → Cloudflare Access (auth gate)
+     → Cloudflare Worker (src/index.ts)
+         ├── / → 302 redirect to /d/cf-network-analytics?kiosk
+         ├── Static assets (js/css/fonts) → edge cache (24h TTL)
+         └── All other requests → proxy to container
+     → Grafana Container (port 3000)
+     → Infinity Plugin → Cloudflare GraphQL API
+```
+
+- **Authentication**: Cloudflare Access (Zero Trust)
+- **Compute**: Cloudflare Worker Container (Grafana OSS 11.6)
+- **Data**: Cloudflare GraphQL Analytics API (NAv2)
+- **Datasource**: Grafana Infinity plugin (GraphQL mode, Bearer token auth)
+- **Performance**: Static asset edge caching (24h), container sleeps after 4h of inactivity
 
 ---
 
@@ -103,13 +192,9 @@ Worker secrets are encrypted and stored by Cloudflare. They are passed into the 
 # Set your Cloudflare API token (from Step 1)
 npx wrangler secret put CF_API_TOKEN
 # Paste your token when prompted, then press Enter
-
-# Set a Grafana admin password (used for admin access behind Access)
-npx wrangler secret put GF_SECURITY_ADMIN_PASSWORD
-# Type a password when prompted, then press Enter
 ```
 
-> **Note**: These secrets are encrypted at rest and never visible in the dashboard or Wrangler output after being set.
+> **Note**: This secret is encrypted at rest and never visible in the dashboard or Wrangler output after being set.
 
 ---
 
@@ -141,11 +226,11 @@ npx wrangler secret put GF_SECURITY_ADMIN_PASSWORD
 
 ### How it works
 
-- The **Worker** (`src/index.ts`) receives all HTTP requests and forwards them to the Grafana container
+- The **Worker** (`src/index.ts`) receives all HTTP requests, redirects `/` to kiosk mode, edge-caches static assets, and proxies everything else to the Grafana container
 - The **Container** runs Grafana OSS with the Infinity datasource plugin pre-installed
 - The dashboard and datasource are **auto-provisioned** — no manual Grafana setup needed
 - `max_instances = 1` ensures a single stateful Grafana instance (SQLite DB)
-- `sleepAfter = "30m"` puts the container to sleep after 30 minutes of inactivity to save costs; it wakes automatically on the next request
+- `sleepAfter = "4h"` puts the container to sleep after 4 hours of inactivity to save costs; it wakes automatically on the next request
 
 ---
 
@@ -196,7 +281,7 @@ Cloudflare Access acts as a Zero Trust authentication layer in front of your Gra
 1. Click **Save application**
 2. Visit your Worker URL: `https://grafana-network-analytics.<your-subdomain>.workers.dev`
 3. You should see the **Cloudflare Access login page**
-4. After authenticating, you'll be redirected to the Grafana dashboard
+4. After authenticating, you'll be redirected to the Grafana dashboard in kiosk mode
 
 > **Why anonymous auth is enabled in Grafana**: Since Cloudflare Access handles authentication, Grafana is configured with anonymous viewer access. Only users who pass the Access gate can reach Grafana at all.
 
@@ -230,8 +315,8 @@ Instead of using the `workers.dev` subdomain, you can use your own domain.
 After deployment, open the Grafana dashboard in your browser.
 
 1. **Set Account Tag**: Click the gear icon or go to **Dashboard Settings** → **Variables** → edit `accountTag` and set it to your Cloudflare Account Tag from Step 2
-2. **Adjust Time Range**: The default is last 4 hours. Use the time picker to change.
-3. **Time Bucket**: Use the dropdown to select aggregation granularity (1s, 10s, 1m, 5m, 15m, 1h)
+2. **Adjust Time Range**: The default is last 24 hours. Use the time picker to change.
+3. **Time Bucket**: Use the dropdown to select aggregation granularity (1m, 5m, 15m, 1h)
 4. **Top N**: Controls how many items appear in pie charts (5, 10, 20, 50)
 
 > **Tip**: If you see empty panels, verify your API token has the correct permissions and that your account has Magic Transit, Magic WAN, or Spectrum traffic.
@@ -250,7 +335,6 @@ For local testing with Docker:
 2. Edit `.dev.vars` with your actual values:
    ```
    CF_API_TOKEN=your-actual-api-token
-   GF_SECURITY_ADMIN_PASSWORD=admin
    ```
 
 3. Start the local dev server:
@@ -267,20 +351,29 @@ For local testing with Docker:
 ### Add a new panel
 
 1. Open the dashboard JSON at `container/provisioning/dashboards/cloudflare-network-analytics.json`
-2. Add a new panel object to the `panels` array
+2. Add a new panel object to the appropriate row's `panels` array
 3. Use the same Infinity GraphQL target format as existing panels:
    ```json
    {
      "type": "graphql",
      "source": "url",
-     "format": "dataframe",
+     "format": "table",
      "url": "https://api.cloudflare.com/client/v4/graphql",
-     "body": "query { ... }",
      "root_selector": "data.viewer.accounts.0.<node>",
-     "columns": [...]
+     "columns": [
+       { "selector": "dimensions.ts", "text": "Time", "type": "timestamp" },
+       { "selector": "dimensions.<groupBy>", "text": "<Label>", "type": "string" },
+       { "selector": "avg.<metric>", "text": " ", "type": "number" }
+     ],
+     "url_options": {
+       "method": "POST",
+       "body_type": "graphql",
+       "body_graphql_query": "query { ... }"
+     }
    }
    ```
-4. Redeploy: `npx wrangler deploy`
+4. Add a `partitionByValues` transformation on the string column to create per-series timeseries
+5. Redeploy: `npx wrangler deploy`
 
 ### Available GraphQL nodes
 
@@ -304,20 +397,5 @@ Refer to the [Cloudflare GraphQL Analytics API docs](https://developers.cloudfla
 | Container not starting | Run `npx wrangler containers list` to check status. Ensure Docker was running during deploy. |
 | Access denied at login | Check your Access policy includes your email/domain. Verify IdP is configured. |
 | Dashboard shows "Datasource not found" | The Infinity plugin may not have installed. Rebuild: `npx wrangler deploy` |
-| Slow cold start | First request after sleep takes ~10-30 seconds while the container boots. Subsequent requests are fast. |
-
----
-
-## Architecture
-
-```
-User → Cloudflare Access (auth gate)
-     → Cloudflare Worker (src/index.ts)
-     → Grafana Container (port 3000)
-     → Infinity Plugin → Cloudflare GraphQL API
-```
-
-- **Authentication**: Cloudflare Access (Zero Trust)
-- **Compute**: Cloudflare Worker Container (Grafana OSS)
-- **Data**: Cloudflare GraphQL Analytics API (NAv2)
-- **Datasource**: Grafana Infinity plugin (GraphQL mode, Bearer token auth)
+| Slow cold start | First request after sleep takes ~10-30s while the container boots. Subsequent requests are fast. Static assets are edge-cached for 24h. |
+| Dashboard not in kiosk mode | The Worker redirects `/` to `?kiosk`. If accessing Grafana directly, append `?kiosk` to the URL. |

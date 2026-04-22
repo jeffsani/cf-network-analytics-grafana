@@ -4,7 +4,6 @@ import { env } from "cloudflare:workers";
 interface Env {
   GRAFANA: DurableObjectNamespace;
   CF_API_TOKEN: string;
-  GF_SECURITY_ADMIN_PASSWORD: string;
 }
 
 export class GrafanaContainer extends Container {
@@ -12,7 +11,6 @@ export class GrafanaContainer extends Container {
   sleepAfter = "4h";
   envVars = {
     CF_API_TOKEN: env.CF_API_TOKEN,
-    GF_SECURITY_ADMIN_PASSWORD: env.GF_SECURITY_ADMIN_PASSWORD,
   };
 
   override onStart() {

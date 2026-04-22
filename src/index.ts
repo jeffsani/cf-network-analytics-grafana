@@ -28,8 +28,36 @@ export class GrafanaContainer extends Container {
   }
 }
 
+const STATIC_EXTENSIONS = /\.(js|css|woff2?|ttf|eot|svg|png|ico|map)(\?|$)/;
+const STATIC_TTL = 60 * 60 * 24; // 24 hours
+
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    const url = new URL(request.url);
+    const isStatic = STATIC_EXTENSIONS.test(url.pathname);
+
+    // Serve cacheable static assets from edge cache when possible
+    if (isStatic && request.method === "GET") {
+      const cache = caches.default;
+      const cached = await cache.match(request);
+      if (cached) return cached;
+
+      const container = getContainer(env.GRAFANA, "grafana");
+      await container.startAndWaitForPorts();
+      const response = await container.fetch(request);
+
+      if (response.ok) {
+        const cacheable = new Response(response.body, response);
+        cacheable.headers.set(
+          "Cache-Control",
+          `public, max-age=${STATIC_TTL}`
+        );
+        ctx.waitUntil(cache.put(request, cacheable.clone()));
+        return cacheable;
+      }
+      return response;
+    }
+
     const container = getContainer(env.GRAFANA, "grafana");
     await container.startAndWaitForPorts();
     return container.fetch(request);

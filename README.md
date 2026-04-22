@@ -35,8 +35,10 @@ Uses the [Grafana Infinity datasource plugin](https://grafana.com/grafana/plugin
 | Panel | Type | Description |
 |-------|------|-------------|
 | New TCP Connections by Destination | Timeseries | New TCP connections grouped by destination subnet |
-| Drops by Reason (Packets/s) | Timeseries | flowtrackd drops grouped by drop reason |
+| Drops by Mitigation Reason (Packets/s) | Timeseries | dosd drops grouped by mitigation reason and protocol state |
 | TCP Challenge Activity by Destination (Connections/s) | Timeseries | SYN cookie challenge events (CHALLENGE_NEEDED + CHALLENGE_PASSED) grouped by destination and reason |
+| Challenge Success Rate (Connections/s) | Timeseries | CHALLENGE_NEEDED vs CHALLENGE_PASSED over time — high needed with low passed indicates spoofed SYN floods |
+| Top Challenged Source IPs | Pie chart | Top source IPs triggering flowtrackd SYN cookie challenges |
 
 ### Magic Firewall (collapsed)
 
@@ -60,7 +62,7 @@ Uses the [Grafana Infinity datasource plugin](https://grafana.com/grafana/plugin
 | Fragmented Packet Rate (Packets/s) | Timeseries | Packets with IP `moreFragments` flag set |
 | Fragmented Traffic Rate (Bits/s) | Timeseries | Same as above in bits per second |
 | ICMP "Fragmentation Needed" Rate (Packets/s) | Timeseries | ICMP type 3 code 4 (Path MTU Discovery) packets |
-| Top Source ASNs Sending Fragments | Pie chart | Top N source ASNs sending fragmented traffic |
+| Top Source IPs Sending Fragments | Pie chart | Top source IPs sending fragmented packets (`ipMoreFragments: 1`) |
 
 ### GraphQL Data Sources
 

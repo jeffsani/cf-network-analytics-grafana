@@ -1516,7 +1516,7 @@
               "sort": "desc"
             }
           },
-          "title": "Drops by Reason (Packets/s)",
+          "title": "Drops by Mitigation Reason (Packets/s)",
           "type": "timeseries",
           "targets": [
             {
@@ -1680,6 +1680,244 @@
                 "naming": {
                   "withNames": false
                 }
+              }
+            }
+          ]
+        },
+        {
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "bars",
+                "fillOpacity": 80,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineWidth": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "stacking": {
+                  "group": "A",
+                  "mode": "normal"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "min": 0,
+              "unit": "cps"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 53
+          },
+          "id": 25,
+          "options": {
+            "legend": {
+              "calcs": [
+                "mean",
+                "max"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "sortBy": "Max",
+              "sortDesc": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "title": "Challenge Success Rate (Connections/s)",
+          "type": "timeseries",
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "${datasource}"
+              },
+              "type": "graphql",
+              "source": "url",
+              "format": "table",
+              "url": "https://api.cloudflare.com/client/v4/graphql",
+              "root_selector": "data.viewer.accounts.0.flowtrackdNetworkAnalyticsAdaptiveGroups",
+              "columns": [
+                {
+                  "selector": "dimensions.ts",
+                  "text": "Time",
+                  "type": "timestamp"
+                },
+                {
+                  "selector": "dimensions.mitigationReason",
+                  "text": "Reason",
+                  "type": "string"
+                },
+                {
+                  "selector": "avg.packetRate",
+                  "text": " ",
+                  "type": "number"
+                }
+              ],
+              "url_options": {
+                "method": "POST",
+                "params": [],
+                "headers": [],
+                "body_type": "graphql",
+                "body_content_type": "application/json",
+                "body_form": [],
+                "body_graphql_query": "query {\n  viewer {\n    accounts(filter: {accountTag: \"${accountTag}\"}) {\n      flowtrackdNetworkAnalyticsAdaptiveGroups(\n        limit: 10000\n        filter: {\n          datetime_geq: \"${__from:date:iso}\"\n          datetime_lt: \"${__to:date:iso}\"\n          outcome: \"drop\"\n        }\n        orderBy: [datetime${timeBucket}_ASC, avg_packetRate${timeBucket}_DESC]\n      ) {\n        dimensions {\n          ts: datetime${timeBucket}\n          mitigationReason\n        }\n        avg {\n          packetRate: packetRate${timeBucket}\n        }\n      }\n    }\n  }\n}",
+                "data": ""
+              }
+            }
+          ],
+          "transformations": [
+            {
+              "id": "partitionByValues",
+              "options": {
+                "fields": [
+                  "Reason"
+                ],
+                "keepFields": false
+              }
+            }
+          ]
+        },
+        {
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "${datasource}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "mappings": [],
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 61
+          },
+          "id": 26,
+          "options": {
+            "displayLabels": [],
+            "legend": {
+              "displayMode": "table",
+              "placement": "right",
+              "values": [
+                "value"
+              ]
+            },
+            "pieType": "pie",
+            "reduceOptions": {
+              "values": false,
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": ""
+            },
+            "tooltip": {
+              "mode": "single"
+            }
+          },
+          "title": "Top Challenged Source IPs",
+          "type": "piechart",
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "${datasource}"
+              },
+              "type": "graphql",
+              "source": "url",
+              "format": "table",
+              "url": "https://api.cloudflare.com/client/v4/graphql",
+              "root_selector": "data.viewer.accounts.0.flowtrackdNetworkAnalyticsAdaptiveGroups",
+              "columns": [
+                {
+                  "selector": "dimensions.sourceIp",
+                  "text": "Source IP",
+                  "type": "string"
+                },
+                {
+                  "selector": "sum.packets",
+                  "text": "Packets",
+                  "type": "number"
+                }
+              ],
+              "url_options": {
+                "method": "POST",
+                "params": [],
+                "headers": [],
+                "body_type": "graphql",
+                "body_content_type": "application/json",
+                "body_form": [],
+                "body_graphql_query": "query {\n  viewer {\n    accounts(filter: {accountTag: \"${accountTag}\"}) {\n      flowtrackdNetworkAnalyticsAdaptiveGroups(\n        limit: 10000\n        filter: {\n          datetime_geq: \"${__from:date:iso}\"\n          datetime_lt: \"${__to:date:iso}\"\n          outcome: \"drop\"\n        }\n      ) {\n        dimensions {\n          sourceIp\n        }\n        sum {\n          packets\n        }\n      }\n    }\n  }\n}",
+                "data": ""
+              }
+            }
+          ],
+          "transformations": [
+            {
+              "id": "sortBy",
+              "options": {
+                "fields": {},
+                "sort": [
+                  {
+                    "field": "Packets",
+                    "desc": true
+                  }
+                ]
+              }
+            },
+            {
+              "id": "limit",
+              "options": {
+                "maxRows": 15
+              }
+            },
+            {
+              "id": "rowsToFields",
+              "options": {
+                "mappings": [
+                  {
+                    "fieldName": "Source IP",
+                    "handlerKey": "field.name"
+                  },
+                  {
+                    "fieldName": "Packets",
+                    "handlerKey": "field.value"
+                  }
+                ]
               }
             }
           ]
@@ -2596,7 +2834,7 @@
                 "mode": "palette-classic"
               },
               "mappings": [],
-              "unit": "pps"
+              "unit": "short"
             },
             "overrides": []
           },
@@ -2628,7 +2866,7 @@
               "mode": "single"
             }
           },
-          "title": "Top Source ASNs Sending Fragments",
+          "title": "Top Source IPs Sending Fragments",
           "type": "piechart",
           "targets": [
             {
@@ -2644,8 +2882,8 @@
               "root_selector": "data.viewer.accounts.0.magicTransitNetworkAnalyticsAdaptiveGroups",
               "columns": [
                 {
-                  "selector": "dimensions.sourceAsnName",
-                  "text": "ASN",
+                  "selector": "dimensions.sourceIp",
+                  "text": "Source IP",
                   "type": "string"
                 },
                 {
@@ -2661,10 +2899,9 @@
                 "body_type": "graphql",
                 "body_content_type": "application/json",
                 "body_form": [],
-                "body_graphql_query": "query {\n  viewer {\n    accounts(filter: {accountTag: \"${accountTag}\"}) {\n      magicTransitNetworkAnalyticsAdaptiveGroups(\n        limit: 10000\n        filter: {\n          datetime_geq: \"${__from:date:iso}\"\n          datetime_lt: \"${__to:date:iso}\"\n          ipMoreFragments: 1\n        }\n      ) {\n        dimensions {\n          sourceAsnName\n        }\n        sum {\n          packets\n        }\n      }\n    }\n  }\n}",
+                "body_graphql_query": "query {\n  viewer {\n    accounts(filter: {accountTag: \"${accountTag}\"}) {\n      magicTransitNetworkAnalyticsAdaptiveGroups(\n        limit: 10000\n        filter: {\n          datetime_geq: \"${__from:date:iso}\"\n          datetime_lt: \"${__to:date:iso}\"\n          ipMoreFragments: 1\n        }\n      ) {\n        dimensions {\n          sourceIp\n        }\n        sum {\n          packets\n        }\n      }\n    }\n  }\n}",
                 "data": ""
-              },
-              "parser": "backend"
+              }
             }
           ],
           "transformations": [
@@ -2691,7 +2928,7 @@
               "options": {
                 "mappings": [
                   {
-                    "fieldName": "ASN",
+                    "fieldName": "Source IP",
                     "handlerKey": "field.name"
                   },
                   {

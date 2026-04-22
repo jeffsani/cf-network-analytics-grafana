@@ -34,6 +34,15 @@ const STATIC_TTL = 60 * 60 * 24; // 24 hours
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+
+    // Redirect bare root to the dashboard in kiosk mode
+    if (url.pathname === "/" || url.pathname === "") {
+      return Response.redirect(
+        `${url.origin}/d/cf-network-analytics?kiosk`,
+        302
+      );
+    }
+
     const isStatic = STATIC_EXTENSIONS.test(url.pathname);
 
     // Serve cacheable static assets from edge cache when possible

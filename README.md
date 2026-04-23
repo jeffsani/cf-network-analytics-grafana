@@ -46,6 +46,9 @@ Uses the [Grafana Infinity datasource plugin](https://grafana.com/grafana/plugin
 |-------|------|-------------|
 | Drops by Rule ID (Packets/s) | Timeseries | Magic Firewall drops grouped by rule ID |
 | Drops by Destination (Packets/s) | Timeseries | Magic Firewall drops grouped by destination subnet |
+| Drops by Protocol (Packets/s) | Timeseries | Magic Firewall drops grouped by IP protocol (TCP, UDP, ICMP, etc.) |
+| Top Blocked Source IPs | Pie chart | Top source IPs blocked by Magic Firewall rules |
+| Top Blocked Source Countries | Pie chart | Geographic origin of traffic blocked by Magic Firewall |
 
 ### Spectrum (collapsed)
 

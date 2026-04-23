@@ -3290,8 +3290,7 @@
                 "body_form": [],
                 "body_graphql_query": "query {\n  viewer {\n    accounts(filter: {accountTag: \"${accountTag}\"}) {\n      magicTransitNetworkAnalyticsAdaptiveGroups(\n        limit: 10000\n        filter: {\n          datetime_geq: \"${__from:date:iso}\"\n          datetime_lt: \"${__to:date:iso}\"\n          ipMoreFragments: 1\n        }\n      ) {\n        dimensions {\n          sourceIp\n        }\n        sum {\n          packets\n        }\n      }\n    }\n  }\n}",
                 "data": ""
-              },
-              "parser": "backend"
+              }
             }
           ],
           "transformations": [

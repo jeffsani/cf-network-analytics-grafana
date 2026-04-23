@@ -1879,7 +1879,7 @@
               "root_selector": "data.viewer.accounts.0.flowtrackdNetworkAnalyticsAdaptiveGroups",
               "columns": [
                 {
-                  "selector": "dimensions.sourceIp",
+                  "selector": "dimensions.ipSourceAddress",
                   "text": "Source IP",
                   "type": "string"
                 },
@@ -1896,7 +1896,7 @@
                 "body_type": "graphql",
                 "body_content_type": "application/json",
                 "body_form": [],
-                "body_graphql_query": "query {\n  viewer {\n    accounts(filter: {accountTag: \"${accountTag}\"}) {\n      flowtrackdNetworkAnalyticsAdaptiveGroups(\n        limit: 10000\n        filter: {\n          datetime_geq: \"${__from:date:iso}\"\n          datetime_lt: \"${__to:date:iso}\"\n          outcome: \"drop\"\n        }\n      ) {\n        dimensions {\n          sourceIp\n        }\n        sum {\n          packets\n        }\n      }\n    }\n  }\n}",
+                "body_graphql_query": "query {\n  viewer {\n    accounts(filter: {accountTag: \"${accountTag}\"}) {\n      flowtrackdNetworkAnalyticsAdaptiveGroups(\n        limit: 10000\n        filter: {\n          datetime_geq: \"${__from:date:iso}\"\n          datetime_lt: \"${__to:date:iso}\"\n          outcome: \"drop\"\n        }\n      ) {\n        dimensions {\n          ipSourceAddress\n        }\n        sum {\n          packets\n        }\n      }\n    }\n  }\n}",
                 "data": ""
               }
             }
@@ -2194,8 +2194,7 @@
                 "barWidthFactor": 0.6
               },
               "min": 0,
-              "unit": "short",
-              "displayName": "${__series.name}"
+              "unit": "pps"
             },
             "overrides": []
           },
@@ -2234,7 +2233,7 @@
               },
               "type": "graphql",
               "source": "url",
-              "format": "dataframe",
+              "format": "table",
               "url": "https://api.cloudflare.com/client/v4/graphql",
               "root_selector": "data.viewer.accounts.0.spectrumNetworkAnalyticsAdaptiveGroups",
               "columns": [
@@ -2250,7 +2249,7 @@
                 },
                 {
                   "selector": "avg.packetRate",
-                  "text": "Rate",
+                  "text": " ",
                   "type": "number"
                 }
               ],
@@ -2299,8 +2298,7 @@
                 "barWidthFactor": 0.6
               },
               "min": 0,
-              "unit": "short",
-              "displayName": "${__series.name}"
+              "unit": "bps"
             },
             "overrides": []
           },
@@ -2339,7 +2337,7 @@
               },
               "type": "graphql",
               "source": "url",
-              "format": "dataframe",
+              "format": "table",
               "url": "https://api.cloudflare.com/client/v4/graphql",
               "root_selector": "data.viewer.accounts.0.spectrumNetworkAnalyticsAdaptiveGroups",
               "columns": [
@@ -2355,7 +2353,7 @@
                 },
                 {
                   "selector": "avg.bitRate",
-                  "text": "Rate",
+                  "text": " ",
                   "type": "number"
                 }
               ],
@@ -2403,9 +2401,9 @@
                 "lineWidth": 1,
                 "barWidthFactor": 0.6
               },
+              "displayName": "${__field.labels[\"Destination IP\"]} — ${__field.labels[\"Mitigation System\"]}",
               "min": 0,
-              "unit": "short",
-              "displayName": "${__series.name}"
+              "unit": "pps"
             },
             "overrides": []
           },
@@ -2444,7 +2442,7 @@
               },
               "type": "graphql",
               "source": "url",
-              "format": "dataframe",
+              "format": "table",
               "url": "https://api.cloudflare.com/client/v4/graphql",
               "root_selector": "data.viewer.accounts.0.spectrumNetworkAnalyticsAdaptiveGroups",
               "columns": [
@@ -2465,7 +2463,7 @@
                 },
                 {
                   "selector": "avg.packetRate",
-                  "text": "Rate",
+                  "text": " ",
                   "type": "number"
                 }
               ],
@@ -2906,7 +2904,7 @@
               "root_selector": "data.viewer.accounts.0.magicTransitNetworkAnalyticsAdaptiveGroups",
               "columns": [
                 {
-                  "selector": "dimensions.sourceIp",
+                  "selector": "dimensions.ipSourceAddress",
                   "text": "Source IP",
                   "type": "string"
                 },
@@ -2923,7 +2921,7 @@
                 "body_type": "graphql",
                 "body_content_type": "application/json",
                 "body_form": [],
-                "body_graphql_query": "query {\n  viewer {\n    accounts(filter: {accountTag: \"${accountTag}\"}) {\n      magicTransitNetworkAnalyticsAdaptiveGroups(\n        limit: 10000\n        filter: {\n          datetime_geq: \"${__from:date:iso}\"\n          datetime_lt: \"${__to:date:iso}\"\n          ipMoreFragments: 1\n        }\n      ) {\n        dimensions {\n          sourceIp\n        }\n        sum {\n          packets\n        }\n      }\n    }\n  }\n}",
+                "body_graphql_query": "query {\n  viewer {\n    accounts(filter: {accountTag: \"${accountTag}\"}) {\n      magicTransitNetworkAnalyticsAdaptiveGroups(\n        limit: 10000\n        filter: {\n          datetime_geq: \"${__from:date:iso}\"\n          datetime_lt: \"${__to:date:iso}\"\n          ipMoreFragments: 1\n        }\n      ) {\n        dimensions {\n          ipSourceAddress\n        }\n        sum {\n          packets\n        }\n      }\n    }\n  }\n}",
                 "data": ""
               }
             }

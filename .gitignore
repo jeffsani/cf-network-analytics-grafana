@@ -6,3 +6,4 @@ node_modules/
 .env
 .env.*
 dist/
+/cloudflare-network-analytics.json

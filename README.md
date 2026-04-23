@@ -92,6 +92,7 @@ Uses the [Grafana Infinity datasource plugin](https://grafana.com/grafana/plugin
 
 ```
 ├── README.md
+├── export-dashboard.sh               # Strips account tag → portable JSON for import
 ├── src/
 │   └── index.ts                       # Worker entrypoint — kiosk redirect + edge caching + proxy
 ├── container/
@@ -348,6 +349,52 @@ For local testing with Docker:
    ```
 
    This runs the Worker locally and starts the Grafana container via Docker.
+
+---
+
+## Sharing the Dashboard
+
+### Option A: Public Link (no login required)
+
+The Grafana instance has the **Public Dashboards** feature enabled. This creates a read-only public URL that anyone can view — no Grafana account, no Cloudflare Access authentication.
+
+1. Access your Grafana instance (exit kiosk mode by pressing `Esc` or removing `?kiosk` from the URL)
+2. Open the dashboard → click **Share** (top bar) → **Public Dashboard** tab
+3. Toggle **Enabled** → copy the generated public URL
+4. Share the URL — viewers see a live, auto-refreshing, read-only dashboard
+
+> **Note**: The public URL bypasses Cloudflare Access. Anyone with the link can view the dashboard data. The URL is unguessable (random UID), but treat it as sensitive if your traffic data is confidential.
+
+### Option B: Import into Another Grafana Instance
+
+Others can import the dashboard JSON into their own Grafana installation.
+
+**Export a portable dashboard** (strips your account tag):
+
+```bash
+./export-dashboard.sh
+# → cloudflare-network-analytics.json
+```
+
+**Prerequisites on the target Grafana instance:**
+- [Infinity datasource plugin](https://grafana.com/grafana/plugins/yesoreyeram-infinity-datasource/) installed
+- A Cloudflare API token with **Account Analytics: Read** permission (see [Step 1](#step-1-create-a-cloudflare-api-token))
+
+**Import steps:**
+
+1. In Grafana, go to **Dashboards** → **Import** → **Upload JSON file** → select the exported `cloudflare-network-analytics.json`
+
+2. When prompted, select your Infinity datasource instance
+
+3. Configure the Infinity datasource (if not already done):
+   - Go to **Connections** → **Data sources** → **Add data source** → search for **Infinity**
+   - Under **Authentication**, set:
+     - **Auth Method**: `Bearer Token`
+     - **Bearer Token**: your Cloudflare API token
+   - Under **Allowed hosts**, add: `https://api.cloudflare.com`
+   - Click **Save & Test**
+
+4. Open the imported dashboard and set the **accountTag** variable to your Cloudflare Account Tag (see [Step 2](#step-2-find-your-cloudflare-account-tag))
 
 ---
 

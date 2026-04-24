@@ -14,19 +14,19 @@ Uses the [Grafana Infinity datasource plugin](https://grafana.com/grafana/plugin
 
 | Panel | Type | Description |
 |-------|------|-------------|
-| Colo Heatmap | Geomap | Geographic heatmap of traffic volume across Cloudflare colos, grouped by geohash to de-duplicate co-located colos |
-| Top Attacks (Packets/s) | Timeseries | Top dropped attack timeseries grouped by Attack Vector and Attack ID |
-| Top Source ASNs (Packets/s) | Pie chart | Top N source ASNs by packet rate |
-| Top Source Countries (Packets/s) | Pie chart | Top N source countries by packet rate |
-| Passed Traffic by Protocol (Packets/s) | Timeseries | Passed traffic grouped by IP protocol (TCP, UDP, etc.) — stacked bars |
-| Passed Traffic by Protocol (Bits/s) | Timeseries | Same as above in bits per second |
 | Traffic by Destination Prefix (Packets/s) | Timeseries | All passed traffic grouped by destination subnet — stacked bars |
 | Traffic by Destination Prefix (Bits/s) | Timeseries | Same as above in bits per second |
+| Top Source ASNs (Packets/s) | Pie chart | Top N source ASNs by packet rate |
+| Top Source Countries (Packets/s) | Pie chart | Top N source countries by packet rate |
+| Colo Heatmap | Geomap | Geographic heatmap of traffic volume across Cloudflare colos, grouped by geohash to de-duplicate co-located colos |
+| Top Attacks (Packets/s) | Timeseries | Top dropped attack timeseries grouped by Attack Vector and Attack ID |
 
 ### Traffic Statistics (collapsed)
 
 | Panel | Type | Description |
 |-------|------|-------------|
+| Passed Traffic by Protocol (Packets/s) | Timeseries | Passed traffic grouped by IP protocol (TCP, UDP, etc.) — stacked bars |
+| Passed Traffic by Protocol (Bits/s) | Timeseries | Same as above in bits per second |
 | Dropped Traffic Rates By Mitigation System (Packets/s) | Timeseries | Dropped traffic grouped by mitigation system — stacked bars |
 | Dropped Bit Rates By Mitigation System (Bits/s) | Timeseries | Same as above in bits per second |
 

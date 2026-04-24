@@ -3425,8 +3425,8 @@
       {
         "current": {
           "selected": true,
-          "text": "20",
-          "value": "20"
+          "text": "10",
+          "value": "10"
         },
         "hide": 0,
         "includeAll": false,
@@ -3440,12 +3440,12 @@
             "value": "5"
           },
           {
-            "selected": false,
+            "selected": true,
             "text": "10",
             "value": "10"
           },
           {
-            "selected": true,
+            "selected": false,
             "text": "20",
             "value": "20"
           },

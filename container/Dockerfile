@@ -24,7 +24,6 @@ ENV GF_NEWS_NEWS_FEED_ENABLED=false
 ENV GF_HELP_ENABLED=false
 ENV GF_PROFILE_ENABLED=false
 ENV GF_DASHBOARDS_MIN_REFRESH_INTERVAL=30s
-ENV GF_FEATURE_TOGGLES_ENABLE=publicDashboards
 
 COPY provisioning/datasources/ /etc/grafana/provisioning/datasources/
 COPY provisioning/dashboards/ /etc/grafana/provisioning/dashboards/

@@ -356,7 +356,7 @@ For local testing with Docker:
 
 ### Option A: Public Link (no login required)
 
-The Grafana instance has the **Public Dashboards** feature enabled. This creates a read-only public URL that anyone can view — no Grafana account, no Cloudflare Access authentication.
+Grafana 11.6 includes the **Public Dashboards** feature. This creates a read-only public URL that anyone can view — no Grafana account, no Cloudflare Access authentication.
 
 1. Access your Grafana instance (exit kiosk mode by pressing `Esc` or removing `?kiosk` from the URL)
 2. Open the dashboard → click **Share** (top bar) → **Public Dashboard** tab

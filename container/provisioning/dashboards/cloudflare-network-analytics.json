@@ -3249,11 +3249,9 @@
             },
             "pieType": "pie",
             "reduceOptions": {
-              "values": false,
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": ""
+              "values": true,
+              "calcs": [],
+              "fields": "/^Packets$/"
             },
             "tooltip": {
               "mode": "single"
@@ -3316,21 +3314,6 @@
               "id": "limit",
               "options": {
                 "maxRows": 15
-              }
-            },
-            {
-              "id": "rowsToFields",
-              "options": {
-                "mappings": [
-                  {
-                    "fieldName": "Source IP",
-                    "handlerKey": "field.name"
-                  },
-                  {
-                    "fieldName": "Packets",
-                    "handlerKey": "field.value"
-                  }
-                ]
               }
             }
           ]

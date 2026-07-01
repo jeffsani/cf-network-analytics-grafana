@@ -808,7 +808,7 @@
             "lineWidth": 1,
             "barWidthFactor": 0.6
           },
-          "displayName": "${__field.labels[\"Attack Vector\"]} — ${__field.labels[\"Attack ID\"]}",
+          "displayName": "${__field.labels[\"Attack Vector\"]} \u2014 ${__field.labels[\"Attack ID\"]}",
           "min": 0,
           "unit": "pps"
         },
@@ -1608,7 +1608,7 @@
                 "lineWidth": 1,
                 "barWidthFactor": 0.6
               },
-              "displayName": "${__field.labels[\"Destination Subnet\"]} — ${__field.labels[\"Reason\"]}",
+              "displayName": "${__field.labels[\"Destination Subnet\"]} \u2014 ${__field.labels[\"Reason\"]}",
               "min": 0,
               "unit": "cps"
             },
@@ -1763,7 +1763,7 @@
               "sort": "desc"
             }
           },
-          "description": "CHALLENGE_NEEDED vs CHALLENGE_PASSED over time. A high ratio of needed-to-passed suggests spoofed SYN floods — spoofed sources cannot complete the SYN cookie handshake.",
+          "description": "CHALLENGE_NEEDED vs CHALLENGE_PASSED over time. A high ratio of needed-to-passed suggests spoofed SYN floods \u2014 spoofed sources cannot complete the SYN cookie handshake.",
           "title": "Challenge Success Rate (Connections/s)",
           "type": "timeseries",
           "targets": [
@@ -2768,7 +2768,7 @@
                 "lineWidth": 1,
                 "barWidthFactor": 0.6
               },
-              "displayName": "${__field.labels[\"Destination IP\"]} — ${__field.labels[\"Mitigation System\"]}",
+              "displayName": "${__field.labels[\"Destination IP\"]} \u2014 ${__field.labels[\"Mitigation System\"]}",
               "min": 0,
               "unit": "pps"
             },
@@ -2938,7 +2938,7 @@
               "source": "url",
               "format": "table",
               "url": "https://api.cloudflare.com/client/v4/graphql",
-              "root_selector": "data.viewer.accounts.0.magicTransitNetworkAnalyticsAdaptiveGroups",
+              "root_selector": "data.viewer.accounts[0].magicTransitNetworkAnalyticsAdaptiveGroups",
               "columns": [
                 {
                   "selector": "dimensions.ts",
@@ -2960,8 +2960,7 @@
                 "body_form": [],
                 "body_graphql_query": "query {\n  viewer {\n    accounts(filter: {accountTag: \"${accountTag}\"}) {\n      magicTransitNetworkAnalyticsAdaptiveGroups(\n        limit: 10000\n        filter: {\n          datetime_geq: \"${__from:date:iso}\"\n          datetime_lt: \"${__to:date:iso}\"\n          ipMoreFragments: 1\n        }\n        orderBy: [datetime${timeBucket}_ASC]\n      ) {\n        dimensions {\n          ts: datetime${timeBucket}\n        }\n        avg {\n          packetRate: packetRate${timeBucket}\n        }\n      }\n    }\n  }\n}",
                 "data": ""
-              },
-              "parser": "backend"
+              }
             },
             {
               "refId": "B",
@@ -2973,7 +2972,7 @@
               "source": "url",
               "format": "table",
               "url": "https://api.cloudflare.com/client/v4/graphql",
-              "root_selector": "data.viewer.accounts.0.magicTransitNetworkAnalyticsAdaptiveGroups",
+              "root_selector": "data.viewer.accounts[0].magicTransitNetworkAnalyticsAdaptiveGroups",
               "columns": [
                 {
                   "selector": "dimensions.ts",
@@ -2995,8 +2994,7 @@
                 "body_form": [],
                 "body_graphql_query": "query {\n  viewer {\n    accounts(filter: {accountTag: \"${accountTag}\"}) {\n      magicTransitNetworkAnalyticsAdaptiveGroups(\n        limit: 10000\n        filter: {\n          datetime_geq: \"${__from:date:iso}\"\n          datetime_lt: \"${__to:date:iso}\"\n          ipFragmentOffset_gt: 0\n        }\n        orderBy: [datetime${timeBucket}_ASC]\n      ) {\n        dimensions {\n          ts: datetime${timeBucket}\n        }\n        avg {\n          packetRate: packetRate${timeBucket}\n        }\n      }\n    }\n  }\n}",
                 "data": ""
-              },
-              "parser": "backend"
+              }
             }
           ],
           "transformations": []
@@ -3063,7 +3061,7 @@
               "source": "url",
               "format": "table",
               "url": "https://api.cloudflare.com/client/v4/graphql",
-              "root_selector": "data.viewer.accounts.0.magicTransitNetworkAnalyticsAdaptiveGroups",
+              "root_selector": "data.viewer.accounts[0].magicTransitNetworkAnalyticsAdaptiveGroups",
               "columns": [
                 {
                   "selector": "dimensions.ts",
@@ -3085,8 +3083,7 @@
                 "body_form": [],
                 "body_graphql_query": "query {\n  viewer {\n    accounts(filter: {accountTag: \"${accountTag}\"}) {\n      magicTransitNetworkAnalyticsAdaptiveGroups(\n        limit: 10000\n        filter: {\n          datetime_geq: \"${__from:date:iso}\"\n          datetime_lt: \"${__to:date:iso}\"\n          ipMoreFragments: 1\n        }\n        orderBy: [datetime${timeBucket}_ASC]\n      ) {\n        dimensions {\n          ts: datetime${timeBucket}\n        }\n        avg {\n          bitRate: bitRate${timeBucket}\n        }\n      }\n    }\n  }\n}",
                 "data": ""
-              },
-              "parser": "backend"
+              }
             },
             {
               "refId": "B",
@@ -3098,7 +3095,7 @@
               "source": "url",
               "format": "table",
               "url": "https://api.cloudflare.com/client/v4/graphql",
-              "root_selector": "data.viewer.accounts.0.magicTransitNetworkAnalyticsAdaptiveGroups",
+              "root_selector": "data.viewer.accounts[0].magicTransitNetworkAnalyticsAdaptiveGroups",
               "columns": [
                 {
                   "selector": "dimensions.ts",
@@ -3120,8 +3117,7 @@
                 "body_form": [],
                 "body_graphql_query": "query {\n  viewer {\n    accounts(filter: {accountTag: \"${accountTag}\"}) {\n      magicTransitNetworkAnalyticsAdaptiveGroups(\n        limit: 10000\n        filter: {\n          datetime_geq: \"${__from:date:iso}\"\n          datetime_lt: \"${__to:date:iso}\"\n          ipFragmentOffset_gt: 0\n        }\n        orderBy: [datetime${timeBucket}_ASC]\n      ) {\n        dimensions {\n          ts: datetime${timeBucket}\n        }\n        avg {\n          bitRate: bitRate${timeBucket}\n        }\n      }\n    }\n  }\n}",
                 "data": ""
-              },
-              "parser": "backend"
+              }
             }
           ],
           "transformations": []
@@ -3174,7 +3170,7 @@
               "sort": "desc"
             }
           },
-          "description": "ICMP type 3 code 4 (Destination Unreachable / Fragmentation Needed) packets. These are Path MTU Discovery messages — sustained high rates may indicate MTU black holes.",
+          "description": "ICMP type 3 code 4 (Destination Unreachable / Fragmentation Needed) packets. These are Path MTU Discovery messages \u2014 sustained high rates may indicate MTU black holes.",
           "title": "ICMP \"Fragmentation Needed\" Rate (Packets/s)",
           "type": "timeseries",
           "targets": [
@@ -3188,7 +3184,7 @@
               "source": "url",
               "format": "table",
               "url": "https://api.cloudflare.com/client/v4/graphql",
-              "root_selector": "data.viewer.accounts.0.magicTransitNetworkAnalyticsAdaptiveGroups",
+              "root_selector": "data.viewer.accounts[0].magicTransitNetworkAnalyticsAdaptiveGroups",
               "columns": [
                 {
                   "selector": "dimensions.ts",
@@ -3210,8 +3206,7 @@
                 "body_form": [],
                 "body_graphql_query": "query {\n  viewer {\n    accounts(filter: {accountTag: \"${accountTag}\"}) {\n      magicTransitNetworkAnalyticsAdaptiveGroups(\n        limit: 10000\n        filter: {\n          datetime_geq: \"${__from:date:iso}\"\n          datetime_lt: \"${__to:date:iso}\"\n          ipProtocol: 1\n          icmpType: 3\n          icmpCode: 4\n        }\n        orderBy: [datetime${timeBucket}_ASC]\n      ) {\n        dimensions {\n          ts: datetime${timeBucket}\n        }\n        avg {\n          packetRate: packetRate${timeBucket}\n        }\n      }\n    }\n  }\n}",
                 "data": ""
-              },
-              "parser": "backend"
+              }
             }
           ],
           "transformations": []
@@ -3271,7 +3266,7 @@
               "source": "url",
               "format": "table",
               "url": "https://api.cloudflare.com/client/v4/graphql",
-              "root_selector": "data.viewer.accounts.0.magicTransitNetworkAnalyticsAdaptiveGroups",
+              "root_selector": "data.viewer.accounts[0].magicTransitNetworkAnalyticsAdaptiveGroups",
               "columns": [
                 {
                   "selector": "dimensions.sourceIp",
@@ -3293,8 +3288,7 @@
                 "body_form": [],
                 "body_graphql_query": "query {\n  viewer {\n    accounts(filter: {accountTag: \"${accountTag}\"}) {\n      magicTransitNetworkAnalyticsAdaptiveGroups(\n        limit: 10000\n        filter: {\n          datetime_geq: \"${__from:date:iso}\"\n          datetime_lt: \"${__to:date:iso}\"\n          ipMoreFragments: 1\n        }\n      ) {\n        dimensions {\n          sourceIp\n        }\n        sum {\n          packets\n        }\n      }\n    }\n  }\n}",
                 "data": ""
-              },
-              "parser": "backend"
+              }
             }
           ],
           "transformations": [
